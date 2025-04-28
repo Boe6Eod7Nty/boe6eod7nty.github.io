@@ -1,0 +1,43 @@
+.site-claim {
+  clear: left;
+  margin-left: 0rem;
+}
+
+.back-to-top-small {
+  text-align: center;
+}
+
+#goto_prev {
+  float:right;
+  margin-right:2rem;
+}
+
+#info-bar-right {
+ padding-left: 3rem;
+}
+
+#footer {
+ height: 10rem;
+}
+
+.search-details {
+    margin-left: 15px;
+}
+
+.item_short_icon {
+    display: inline-block;
+    width: 30px;
+}
+
+.list-item img {
+    float: none;
+}
+
+.about-me h4 {
+    border-bottom: none;
+}
+
+.about-me img {
+    float: left;
+    margin-right: 1.5rem;
+}

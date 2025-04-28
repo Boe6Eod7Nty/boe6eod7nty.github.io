@@ -1,0 +1,39 @@
+.search-flex-container {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    margin-bottom: 15px;
+}
+
+.search-image-column {
+    flex: 0 0 200px; /* Fixed width for the image column */
+}
+
+.search-content-column {
+    flex: 1; /* Takes up remaining space */
+    display: flex;
+    flex-direction: column;
+}
+
+.search-date {
+    margin-bottom: 10px;
+}
+
+.search-excerpt {
+    margin-bottom: 10px;
+}
+
+.search-image a img {
+    margin-bottom: 0;
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 768px) {
+    .search-flex-container {
+        flex-direction: column;
+    }
+    
+    .search-image-column {
+        margin-bottom: 0px;
+    }
+}

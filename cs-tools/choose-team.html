@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CS Tools — Choose Team</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+  <body>
+    <details class="site-menu">
+      <summary class="hamburger-toggle" aria-label="Open navigation">Menu</summary>
+      <nav class="site-menu-panel" aria-label="Global navigation">
+        <a href="index.html">Home</a>
+        <a href="browse-maps.html">Browse Maps</a>
+        <a href="choose-team.html">Choose Team</a>
+        <a href="choose-map.html">Choose Map</a>
+        <a href="choose-team.html?mode=both">Choose Both</a>
+      </nav>
+    </details>
+
+    <main class="page-shell is-fullheight">
+      <header class="page-header">
+        <h1 class="page-heading">Choose Team</h1>
+        <p class="page-lede" id="mode-help">
+          Populate the pool below, drag names into squad boxes, and lock rotations when satisfied.
+        </p>
+      </header>
+
+      <div class="team-controls">
+        <button type="button" class="button lock-toggle is-muted" id="lock-toggle">Lock In</button>
+        <button type="button" class="button is-muted" id="reset-teams">Reset</button>
+      </div>
+
+      <section class="team-shell" id="team-shell" aria-labelledby="teams-heading">
+        <h2 id="teams-heading" class="visually-hidden">Team assignment board</h2>
+        <div class="team-zone">
+          <div class="team-panel">
+            <div class="team-header-row">
+              <input class="team-title-edit" id="team-one-title" type="text" maxlength="56" autocomplete="off" aria-label="Team one title">
+              <button type="button" class="side-toggle is-unknown" data-side-target="team1" aria-label="Team one side unset"> — </button>
+            </div>
+            <div class="team-drop-zone" data-drop-target="team1" aria-label="Team one roster"></div>
+          </div>
+          <div class="team-panel">
+            <div class="team-header-row">
+              <input class="team-title-edit" id="team-two-title" type="text" maxlength="56" autocomplete="off" aria-label="Team two title">
+              <button type="button" class="side-toggle is-unknown" data-side-target="team2" aria-label="Team two side unset"> — </button>
+            </div>
+            <div class="team-drop-zone" data-drop-target="team2" aria-label="Team two roster"></div>
+          </div>
+        </div>
+        <section class="player-pool">
+          <div class="detail-label">Player pool</div>
+          <div class="player-pool-chips" id="player-pool" aria-live="polite"></div>
+          <label class="visually-hidden" for="pool-input">Add players</label>
+          <input class="field" id="pool-input" type="text" placeholder="Separate names by comma or Enter" autocomplete="off">
+        </section>
+      </section>
+    </main>
+
+    <style>
+      .visually-hidden {
+        position: absolute;
+        clip: rect(0 0 0 0);
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+      }
+    </style>
+
+    <script src="js/nav-menu.js"></script>
+    <script src="js/choose-team.js"></script>
+  </body>
+</html>

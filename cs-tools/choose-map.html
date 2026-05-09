@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CS Tools — Choose Map</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+  <body>
+    <details class="site-menu">
+      <summary class="hamburger-toggle" aria-label="Open navigation">Menu</summary>
+      <nav class="site-menu-panel" aria-label="Global navigation">
+        <a href="index.html">Home</a>
+        <a href="browse-maps.html">Browse Maps</a>
+        <a href="choose-team.html">Choose Team</a>
+        <a href="choose-map.html">Choose Map</a>
+        <a href="choose-team.html?mode=both">Choose Both</a>
+      </nav>
+    </details>
+
+    <main class="page-shell">
+      <header class="page-header">
+        <h1 class="page-heading">Choose Map</h1>
+        <p class="page-lede" id="chooser-lede">
+          Stage the pool below, tune best-of pacing, then run the veto with live history and reversible turns.
+        </p>
+      </header>
+
+      <section id="panel-selection">
+        <form class="config-panel" id="config-form">
+          <div class="config-grid">
+            <div class="filter-stack">
+              <label for="team-one-name">Team 1 Name</label>
+              <input class="field" id="team-one-name" name="team1Name" maxlength="72" autocomplete="off">
+            </div>
+            <div class="filter-stack">
+              <label for="team-two-name">Team 2 Name</label>
+              <input class="field" id="team-two-name" name="team2Name" maxlength="72" autocomplete="off">
+            </div>
+            <div class="filter-stack">
+              <label for="veto-format-select">Veto format</label>
+              <select class="field" id="veto-format-select" name="vetoFormat">
+                <option value="esl">ESL (classic)</option>
+                <option value="hltv">HLTV pacing</option>
+                <option value="faceit">FACEIT pacing</option>
+                <option value="veto3_random">Veto to 3 + Random</option>
+                <option value="random_pick">Instant random pick</option>
+              </select>
+            </div>
+            <div class="filter-stack">
+              <label for="pool-size-select">Map pool count</label>
+              <select class="field" id="pool-size-select" name="poolSize"></select>
+            </div>
+          </div>
+          <fieldset class="config-inline filter-stack">
+            <legend class="detail-label">Best-of</legend>
+            <div class="radio-row">
+              <label><input type="radio" name="bestOf" value="1"> Bo1</label>
+              <label><input type="radio" name="bestOf" value="3" checked> Bo3</label>
+              <label><input type="radio" name="bestOf" value="5"> Bo5</label>
+            </div>
+          </fieldset>
+          <div class="config-actions">
+            <button class="button is-primary" id="go-veto-btn" type="button" disabled>GO</button>
+            <strong id="picker-count-banner" aria-live="polite">0 / 0 maps selected</strong>
+          </div>
+        </form>
+
+        <form class="filter-bar" id="picker-filters"></form>
+
+        <div class="map-grid" id="picker-grid" aria-live="polite"></div>
+      </section>
+
+      <section id="panel-veto" class="substate-hidden">
+        <div class="turn-banner">
+          <div class="turn-active" id="turn-label">Warmup roster</div>
+          <button type="button" class="button is-muted" id="back-to-picker">Adjust pool</button>
+        </div>
+        <div class="split-layout-veto">
+          <aside class="history-panel">
+            <div class="detail-label">Timeline</div>
+            <div class="history-list" id="history-list"></div>
+            <button type="button" class="button is-muted" id="undo-action">Undo</button>
+            <button type="button" class="button is-muted" id="redo-action">Redo</button>
+            <button type="button" class="button is-muted" id="reset-veto">Reset veto</button>
+          </aside>
+          <section>
+            <div class="map-grid" id="veto-grid" aria-live="polite"></div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <script src="data/maps-data.js"></script>
+    <script src="js/maps-data.js"></script>
+    <script src="js/map-cards.js"></script>
+    <script src="js/map-modal.js"></script>
+    <script src="js/nav-menu.js"></script>
+    <script src="js/choose-map.js"></script>
+  </body>
+</html>

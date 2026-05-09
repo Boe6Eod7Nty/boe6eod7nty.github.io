@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CS Tools</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+  <body>
+    <details class="site-menu">
+      <summary class="hamburger-toggle" aria-label="Open navigation">Menu</summary>
+      <nav class="site-menu-panel" aria-label="Global navigation">
+        <a href="index.html">Home</a>
+        <a href="browse-maps.html">Browse Maps</a>
+        <a href="choose-team.html">Choose Team</a>
+        <a href="choose-map.html">Choose Map</a>
+        <a href="choose-team.html?mode=both">Choose Both</a>
+      </nav>
+    </details>
+
+    <main class="home-shell">
+      <section class="home-panel" aria-labelledby="site-title">
+        <p class="eyebrow">Tactical setup hub</p>
+        <h1 class="site-title" id="site-title">CS Tools</h1>
+        <p class="site-subtitle">
+          Browse Counter-Strike maps, build teams, choose a map pool, or run the full match setup flow.
+        </p>
+
+        <nav class="home-actions" aria-label="CS Tools entry points">
+          <a class="action-card" href="browse-maps.html">
+            <span class="action-copy">
+              <span class="action-title">Browse Maps</span>
+              <span class="action-detail">Search and inspect map metadata.</span>
+            </span>
+            <span class="action-icon" aria-hidden="true">+</span>
+          </a>
+
+          <a class="action-card" href="choose-team.html">
+            <span class="action-copy">
+              <span class="action-title">Choose Team</span>
+              <span class="action-detail">Assign players and sides.</span>
+            </span>
+            <span class="action-icon" aria-hidden="true">T</span>
+          </a>
+
+          <a class="action-card" href="choose-map.html">
+            <span class="action-copy">
+              <span class="action-title">Choose Map</span>
+              <span class="action-detail">Configure a pool and veto format.</span>
+            </span>
+            <span class="action-icon" aria-hidden="true">V</span>
+          </a>
+
+          <a class="action-card" href="choose-team.html?mode=both">
+            <span class="action-copy">
+              <span class="action-title">Choose Both</span>
+              <span class="action-detail">Start the combined team and map flow.</span>
+            </span>
+            <span class="action-icon" aria-hidden="true">GO</span>
+          </a>
+        </nav>
+      </section>
+    </main>
+    <script src="js/nav-menu.js"></script>
+    <script>
+      CSToolsNav?.init(".site-menu");
+    </script>
+  </body>
+</html>

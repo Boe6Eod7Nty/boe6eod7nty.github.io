@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CS Tools — Browse Maps</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+  <body>
+    <details class="site-menu">
+      <summary class="hamburger-toggle" aria-label="Open navigation">Menu</summary>
+      <nav class="site-menu-panel" aria-label="Global navigation">
+        <a href="index.html">Home</a>
+        <a href="browse-maps.html">Browse Maps</a>
+        <a href="choose-team.html">Choose Team</a>
+        <a href="choose-map.html">Choose Map</a>
+        <a href="choose-team.html?mode=both">Choose Both</a>
+      </nav>
+    </details>
+
+    <main class="page-shell">
+      <header class="page-header">
+        <h1 class="page-heading">Browse Maps</h1>
+        <p class="page-lede">Explore the complete metadata set, filter tags, sort by roster history, then dig into thumbnails and workshop links.</p>
+      </header>
+
+      <form class="filter-bar" id="filter-form">
+        <div class="filter-stack">
+          <label for="search-input">Search</label>
+          <input class="field" id="search-input" name="search" type="search" placeholder="Mirage..." autocomplete="off">
+        </div>
+        <div class="filter-stack">
+          <label for="filter-version">Game version</label>
+          <div class="multiselect" data-multiselect="version" data-label="Game version">
+            <button type="button" class="field multiselect-toggle" id="filter-version" aria-haspopup="true" aria-expanded="false"></button>
+            <input type="hidden" name="version" value="all">
+            <div class="multiselect-menu" role="menu" aria-label="Game version options"></div>
+          </div>
+        </div>
+        <div class="filter-stack">
+          <label for="filter-mode">Game mode</label>
+          <div class="multiselect" data-multiselect="mode" data-label="Game mode">
+            <button type="button" class="field multiselect-toggle" id="filter-mode" aria-haspopup="true" aria-expanded="false"></button>
+            <input type="hidden" name="mode" value="hostage_rescue,bomb_defusal">
+            <div class="multiselect-menu" role="menu" aria-label="Game mode options"></div>
+          </div>
+        </div>
+        <div class="filter-stack">
+          <label for="filter-year">Added year</label>
+          <div class="multiselect" data-multiselect="year" data-label="Added year">
+            <button type="button" class="field multiselect-toggle" id="filter-year" aria-haspopup="true" aria-expanded="false"></button>
+            <input type="hidden" name="year" value="all">
+            <div class="multiselect-menu" role="menu" aria-label="Added year options"></div>
+          </div>
+        </div>
+        <div class="filter-stack">
+          <label for="filter-operation">Operation</label>
+          <div class="multiselect" data-multiselect="operation" data-label="Operation">
+            <button type="button" class="field multiselect-toggle" id="filter-operation" aria-haspopup="true" aria-expanded="false"></button>
+            <input type="hidden" name="operation" value="all">
+            <div class="multiselect-menu" role="menu" aria-label="Operation options"></div>
+          </div>
+        </div>
+        <div class="filter-stack">
+          <label for="filter-pool">Pool status</label>
+          <div class="multiselect" data-multiselect="poolStatus" data-label="Pool status">
+            <button type="button" class="field multiselect-toggle" id="filter-pool" aria-haspopup="true" aria-expanded="false"></button>
+            <input type="hidden" name="poolStatus" value="all">
+            <div class="multiselect-menu" role="menu" aria-label="Pool status options"></div>
+          </div>
+        </div>
+        <div class="filter-stack">
+          <label for="filter-sort">Sort by</label>
+          <select class="field" id="filter-sort" name="sortBy">
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="az">A → Z</option>
+            <option value="za">Z → A</option>
+          </select>
+        </div>
+      </form>
+
+      <div class="map-grid" id="map-results" aria-live="polite"></div>
+      <noscript>This page requires JavaScript to load filters and map thumbnails.</noscript>
+    </main>
+
+    <script src="data/maps-data.js"></script>
+    <script src="js/maps-data.js"></script>
+    <script src="js/map-cards.js"></script>
+    <script src="js/map-modal.js"></script>
+    <script src="js/nav-menu.js"></script>
+    <script src="js/browse-maps.js"></script>
+  </body>
+</html>

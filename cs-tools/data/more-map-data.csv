@@ -1,0 +1,39 @@
+id,name,versions,added_date,in_cs2,cs2_type,workshop_links,tags,thumbnail,notes
+de_dust2,Dust II,CS|CSS|CS:GO|CS2,2001,true,official,,bomb_defusal|active_duty|5v5,,First map available in CS2 Limited Test
+de_mirage,Mirage,CS|CSS|CS:GO|CS2,2004,true,official,,bomb_defusal|active_duty|5v5,,Originally cpl_strike
+de_inferno,Inferno,CS|CSS|CS:GO|CS2,2001,true,official,,bomb_defusal|active_duty|5v5,,Full remake for CS2
+de_nuke,Nuke,CS|CSS|CS:GO|CS2,1999,true,official,,bomb_defusal|active_duty|5v5,,
+de_overpass,Overpass,CS:GO|CS2,2013,true,official,,bomb_defusal|5v5,,Reworked for CS2
+de_vertigo,Vertigo,CS|CS:GO|CS2,2001,true,official,,bomb_defusal|active_duty|5v5,,
+de_ancient,Ancient,CS:GO|CS2,2020,true,official,,bomb_defusal|active_duty|5v5,,
+de_anubis,Anubis,CS:GO|CS2,2020,true,official,,bomb_defusal|active_duty|5v5,,
+de_train,Train,CS|CSS|CS:GO|CS2,1999,true,official,,bomb_defusal|5v5,,Reworked and readded Nov 2024
+de_cache,Cache,CSS|CS:GO|CS2,2010,true,community,,bomb_defusal|5v5,,Reworked and readded April 2026
+cs_office,Office,CS|CSS|CS:GO|CS2,2000,true,official,,hostage_rescue|5v5,,
+cs_italy,Italy,CS|CSS|CS:GO|CS2,2000,true,official,,hostage_rescue|5v5,,Remade for CS2
+ar_baggage,Baggage,CS:GO|CS2,2012,true,official,,arms_race,,Readded Feb 2024
+ar_shoots,Shoots,CS:GO|CS2,2012,true,official,,arms_race,,Readded Feb 2024
+ar_pool_day,Pool Day,CS|CSS|CS2,2001,true,community,,arms_race,,Community remake added June 2024
+de_mills,Mills,CS2,2024,true,community,,bomb_defusal|5v5,,Added June 2024
+de_thera,Thera,CS2,2024,true,community,,bomb_defusal|5v5,,Remake of Santorini
+de_assembly,Assembly,CS2,2024,true,community,,wingman,,Added June 2024
+de_memento,Memento,CS2,2024,true,community,,wingman,,Added June 2024
+de_edin,Edin,CS2,2024,true,community,,bomb_defusal|5v5,,Added Nov 2024
+de_basalt,Basalt,CS:GO|CS2,2021,false,none,,bomb_defusal|5v5,,Temporarily readded in 2024; removed May 2025
+de_palais,Palais,CS2,2024,true,community,,wingman,,Added Nov 2024
+de_whistle,Whistle,CS2,2024,true,community,,wingman,,Added Nov 2024
+de_brewery,Brewery,CS2,2025,true,community,,wingman,,Added May 2025
+de_dogtown,Dogtown,CS2,2025,true,community,,wingman,,Added May 2025
+de_grail,Grail,CS2,2025,true,community,,bomb_defusal|5v5,,Added May 2025
+de_jura,Jura,CS2,2025,true,community,,bomb_defusal|5v5,,Added May 2025
+de_golden,Golden,CS2,2025,true,community,,bomb_defusal|5v5,,Added Oct 2025
+de_palacio,Palacio,CS2,2025,true,community,,bomb_defusal|5v5,,Added Oct 2025
+de_rooftop,Rooftop,CS2,2025,true,community,,wingman,,Added Oct 2025
+de_ancient_night,Ancient (Night),CS2,2025,true,official,,bomb_defusal|5v5,,Night variant added Aug 2025
+ar_shoots_night,Shoots (Night),CS2,2025,true,official,,arms_race,,Night variant added Aug 2025
+cs_agency,Agency,CS:GO|CS2,2013,true,community,,hostage_rescue|5v5,,Readded May 2025
+de_canals,Canals,CS:GO|CS2,2017,true,official,,bomb_defusal|5v5,,Direct port from CS:GO
+de_cbble,Cobblestone,CS|CSS|CS:GO|CS2,2000,true,official,,bomb_defusal|5v5,,Direct port from CS:GO
+de_lake,Lake,CS:GO|CS2,2012,true,official,,wingman,,Direct port from CS:GO
+de_shortdust,Shortdust,CS:GO|CS2,2014,true,official,,wingman,,Direct port from CS:GO
+de_transit,Transit,CS2,2025,false,none,,wingman,,Removed Oct 2025 due to copyright/entity issues

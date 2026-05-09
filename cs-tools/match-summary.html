@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CS Tools — Match Summary</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+  <body>
+    <details class="site-menu">
+      <summary class="hamburger-toggle" aria-label="Open navigation">Menu</summary>
+      <nav class="site-menu-panel" aria-label="Global navigation">
+        <a href="index.html">Home</a>
+        <a href="browse-maps.html">Browse Maps</a>
+        <a href="choose-team.html">Choose Team</a>
+        <a href="choose-map.html">Choose Map</a>
+        <a href="choose-team.html?mode=both">Choose Both</a>
+      </nav>
+    </details>
+
+    <main class="page-shell">
+      <header class="page-header">
+        <h1 class="page-heading">Match Summary</h1>
+        <p class="page-lede" id="summary-lede">Full-flow recap distilled from veto output and roster snapshots.</p>
+      </header>
+
+      <section class="summary-grid" aria-live="polite">
+        <article class="summary-panel">
+          <h2 class="detail-label" id="team-one-banner">Team 1</h2>
+          <p class="detail-stack" id="team-one-meta"></p>
+          <ul id="team-one-roster" class="detail-stack"></ul>
+        </article>
+        <article class="summary-panel">
+          <h2 class="detail-label" id="team-two-banner">Team 2</h2>
+          <p class="detail-stack" id="team-two-meta"></p>
+          <ul id="team-two-roster" class="detail-stack"></ul>
+        </article>
+      </section>
+
+      <section class="summary-panel">
+        <h2 class="detail-label">Chosen maps</h2>
+        <div class="summary-maps" id="summary-map-deck"></div>
+      </section>
+
+      <section class="panel" style="padding:16px;">
+        <details>
+          <summary class="detail-label" style="cursor:pointer;">Veto log</summary>
+          <pre id="summary-history" style="margin-top:10px;color:var(--text-secondary);white-space:pre-wrap;font:inherit;"></pre>
+        </details>
+      </section>
+
+      <nav class="config-actions">
+        <a class="button is-muted" href="index.html">Back to Home</a>
+      </nav>
+    </main>
+
+    <script src="data/maps-data.js"></script>
+    <script src="js/maps-data.js"></script>
+    <script src="js/map-cards.js"></script>
+    <script src="js/nav-menu.js"></script>
+    <script src="js/match-summary.js"></script>
+  </body>
+</html>

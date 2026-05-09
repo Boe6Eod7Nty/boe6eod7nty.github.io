@@ -67,6 +67,27 @@
     <script src="js/nav-menu.js"></script>
     <script>
       CSToolsNav?.init(".site-menu");
+      /* Starting Choose Both from home clears stale veto, team board, and session recap. */
+      document.addEventListener(
+        "click",
+        (e) => {
+          const a = e.target.closest("a");
+          if (!a || !a.href) return;
+          try {
+            const u = new URL(a.href, window.location.href);
+            if (!u.pathname.endsWith("choose-team.html")) return;
+            if (u.searchParams.get("mode") !== "both") return;
+          } catch (_) {
+            return;
+          }
+          localStorage.removeItem("cs-tools-veto");
+          localStorage.removeItem("cs-tools-teams");
+          try {
+            sessionStorage.removeItem("cs-tools-match-summary");
+          } catch (_) {}
+        },
+        true,
+      );
     </script>
   </body>
 </html>

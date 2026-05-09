@@ -11,7 +11,18 @@
 
   let plan = [];
   let meta = { format: "", bestOf: 3 };
-  let chain = [{ remaining: [], picks: [], logs: [], pointer: 0, statuses: {}, done: false }];
+  let chain = [
+    {
+      remaining: [],
+      picks: [],
+      logs: [],
+      pointer: 0,
+      statuses: {},
+      done: false,
+      startingSides: {},
+      sideChooserForMap: [],
+    },
+  ];
   let cursorIdx = 0;
 
   let ui = {};
@@ -49,14 +60,55 @@
     return new URLSearchParams(window.location.search || "").get("mode") === "both";
   }
 
+  /** `URLSearchParams#get` already applies percent-decoding; extra decodeURIComponent can corrupt or throw. */
+  function qpDecoded(name) {
+    const raw = new URLSearchParams(location.search || "").get(name);
+    if (raw == null || raw === "") return "";
+    try {
+      return decodeURIComponent(raw.replace(/\+/g, " "));
+    } catch (_) {
+      return raw.replace(/\+/g, " ");
+    }
+  }
+
+  function teamTitlesFromTeamsBlob() {
+    try {
+      const raw = localStorage.getItem("cs-tools-teams");
+      if (!raw) return { team1: "", team2: "" };
+      const blob = JSON.parse(raw);
+      if (!blob?.titles || typeof blob.titles !== "object") return { team1: "", team2: "" };
+      return {
+        team1: typeof blob.titles.team1 === "string" ? blob.titles.team1.trim() : "",
+        team2: typeof blob.titles.team2 === "string" ? blob.titles.team2.trim() : "",
+      };
+    } catch (_) {
+      return { team1: "", team2: "" };
+    }
+  }
+
   function readCfg() {
     const disk = read(CFG_KEY, {});
     const qs = new URLSearchParams(location.search || "");
     const blended = qs.get("mode") === "both";
     let t1 = typeof disk.team1Name === "string" ? disk.team1Name : "Team 1";
     let t2 = typeof disk.team2Name === "string" ? disk.team2Name : "Team 2";
-    if (blended && qs.has("team1")) t1 = decodeURIComponent(qs.get("team1") || "");
-    if (blended && qs.has("team2")) t2 = decodeURIComponent(qs.get("team2") || "");
+    const fromTitles = blended ? teamTitlesFromTeamsBlob() : { team1: "", team2: "" };
+    if (blended && qs.has("team1")) {
+      const q = qpDecoded("team1");
+      if (q) t1 = q;
+      else if (fromTitles.team1) t1 = fromTitles.team1;
+    }
+    if (blended && qs.has("team2")) {
+      const q = qpDecoded("team2");
+      if (q) t2 = q;
+      else if (fromTitles.team2) t2 = fromTitles.team2;
+    }
+    const looksDefaultName = (s, fb) => {
+      const x = String(s ?? "").trim().toLowerCase();
+      return !x || x === fb || x.replace(/\s+/g, "") === "team1" || x.replace(/\s+/g, "") === "team2";
+    };
+    if (blended && !qs.has("team1") && fromTitles.team1 && looksDefaultName(t1, "team 1")) t1 = fromTitles.team1;
+    if (blended && !qs.has("team2") && fromTitles.team2 && looksDefaultName(t2, "team 2")) t2 = fromTitles.team2;
     const pool = Number.isFinite(Number(disk.poolSize)) ? Number(disk.poolSize) : 7;
 
     let bestVal = Number(disk.bestOf);
@@ -103,42 +155,46 @@
   }
 
   function buildFilters(holder) {
-
     holder.innerHTML = `
       <div class="filter-stack">
-        <label for="pick-search-input">Search</label>
-        <input class="field" id="pick-search-input" name="search" type="search" autocomplete="off" />
-      </div>
-      <div class="filter-stack">
         <label for="pick-version">Game version</label>
-        <select class="field" id="pick-version" name="version"></select>
+        <div class="multiselect" data-multiselect="version" data-label="Game version">
+          <button type="button" class="field multiselect-toggle" id="pick-version" aria-haspopup="true" aria-expanded="false"></button>
+          <input type="hidden" name="version" value="all">
+          <div class="multiselect-menu" role="menu" aria-label="Game version options"></div>
+        </div>
       </div>
       <div class="filter-stack">
         <label for="pick-mode">Game mode</label>
-        <select class="field" id="pick-mode" name="mode">
-          <option value="all">All</option>
-          <option value="bomb_defusal">Bomb Defusal</option>
-          <option value="hostage_rescue">Hostage</option>
-          <option value="wingman">Wingman</option>
-        </select>
+        <div class="multiselect" data-multiselect="mode" data-label="Game mode">
+          <button type="button" class="field multiselect-toggle" id="pick-mode" aria-haspopup="true" aria-expanded="false"></button>
+          <input type="hidden" name="mode" value="hostage_rescue,bomb_defusal">
+          <div class="multiselect-menu" role="menu" aria-label="Game mode options"></div>
+        </div>
       </div>
       <div class="filter-stack">
         <label for="pick-year">Year</label>
-        <select class="field" id="pick-year" name="year"></select>
+        <div class="multiselect" data-multiselect="year" data-label="Year">
+          <button type="button" class="field multiselect-toggle" id="pick-year" aria-haspopup="true" aria-expanded="false"></button>
+          <input type="hidden" name="year" value="all">
+          <div class="multiselect-menu" role="menu" aria-label="Year options"></div>
+        </div>
       </div>
       <div class="filter-stack">
         <label for="pick-operation">Operation</label>
-        <select class="field" id="pick-operation" name="operation"></select>
+        <div class="multiselect" data-multiselect="operation" data-label="Operation">
+          <button type="button" class="field multiselect-toggle" id="pick-operation" aria-haspopup="true" aria-expanded="false"></button>
+          <input type="hidden" name="operation" value="all">
+          <div class="multiselect-menu" role="menu" aria-label="Operation options"></div>
+        </div>
       </div>
       <div class="filter-stack">
         <label for="pick-pool">Pool status</label>
-        <select class="field" id="pick-pool" name="poolStatus">
-          <option value="all">All</option>
-          <option value="active_duty">Active Duty</option>
-          <option value="competitive_pool">Competitive Pool</option>
-          <option value="former_competitive_pool">Former Competitive Pool</option>
-          <option value="workshop_only">Workshop Only</option>
-        </select>
+        <div class="multiselect" data-multiselect="poolStatus" data-label="Pool status">
+          <button type="button" class="field multiselect-toggle" id="pick-pool" aria-haspopup="true" aria-expanded="false"></button>
+          <input type="hidden" name="poolStatus" value="all">
+          <div class="multiselect-menu" role="menu" aria-label="Pool status options"></div>
+        </div>
       </div>
       <div class="filter-stack">
         <label for="pick-sort">Sort</label>
@@ -148,57 +204,123 @@
           <option value="az">A → Z</option>
           <option value="za">Z → A</option>
         </select>
+      </div>
+      <div class="filter-stack filter-stack--search">
+        <label for="pick-search-input">Search</label>
+        <input class="field" id="pick-search-input" name="search" type="search" autocomplete="off" />
       </div>`;
-
   }
 
-  function fillSelect(sel, caption, opts) {
+  async function setupMultiSelects(formEl) {
+    const Multi = window.CSToolsMultiSelect;
+    if (!Multi) throw new Error("CSToolsMultiSelect not loaded");
+    const titleCase = Multi.titleCaseFromSlug;
 
-    sel.innerHTML = "";
+    const handles = [];
 
-    const cap = document.createElement("option");
-    cap.value = "all";
-    cap.textContent = caption;
+    handles.push(
+      Multi.create(formEl.querySelector('[data-multiselect="version"]'), {
+        allowAll: true,
+        values: await window.CSToolsMaps.getAvailableVersions(),
+        labelForValue: (v) => v,
+      }),
+    );
 
-    sel.appendChild(cap);
+    handles.push(
+      Multi.create(formEl.querySelector('[data-multiselect="mode"]'), {
+        allowAll: false,
+        values: ["hostage_rescue", "bomb_defusal", "wingman"],
+        labelForValue: (v) => {
+          switch (v) {
+            case "bomb_defusal":
+              return "Defuse";
+            case "hostage_rescue":
+              return "Hostage";
+            case "wingman":
+              return "Wingman";
+            default:
+              return titleCase(v);
+          }
+        },
+      }),
+    );
 
-    opts.forEach((optValue) => {
-      const option = document.createElement("option");
-      option.value = optValue;
+    handles.push(
+      Multi.create(formEl.querySelector('[data-multiselect="year"]'), {
+        allowAll: true,
+        values: await window.CSToolsMaps.getAvailableYears(),
+        labelForValue: (v) => String(v),
+      }),
+    );
 
-      option.textContent = optValue;
+    handles.push(
+      Multi.create(formEl.querySelector('[data-multiselect="operation"]'), {
+        allowAll: true,
+        values: await window.CSToolsMaps.getAvailableOperations(),
+        labelForValue: (v) => titleCase(String(v).replace(/^operation_/, "")),
+      }),
+    );
 
-      sel.appendChild(option);
+    handles.push(
+      Multi.create(formEl.querySelector('[data-multiselect="poolStatus"]'), {
+        allowAll: true,
+        values: ["active_duty", "competitive_pool", "former_competitive_pool", "workshop_only"],
+        labelForValue: (v) => {
+          switch (v) {
+            case "active_duty":
+              return "Active Duty";
+            case "competitive_pool":
+              return "Competitive Pool";
+            case "former_competitive_pool":
+              return "Former Competitive Pool";
+            case "workshop_only":
+              return "Workshop Only";
+            default:
+              return titleCase(v);
+          }
+        },
+      }),
+    );
 
-    });
-
+    return handles;
   }
 
-  async function hydrateSelects(filtersNode) {
-
-    fillSelect(filtersNode.querySelector("#pick-version"), "All versions", await window.CSToolsMaps.getAvailableVersions());
-    fillSelect(filtersNode.querySelector("#pick-year"), "Any year", await window.CSToolsMaps.getAvailableYears());
-    fillSelect(filtersNode.querySelector("#pick-operation"), "Any operation", await window.CSToolsMaps.getAvailableOperations());
-
-  }
-
-  function filterPacket(formEl) {
-
-    return Object.fromEntries(new FormData(formEl).entries());
-
+  function filterPacket(filterFormEl) {
+    const data = Object.fromEntries(new FormData(filterFormEl).entries());
+    const configForm = document.getElementById("config-form");
+    const cs2 =
+      configForm?.elements?.namedItem("cs2Only") || filterFormEl?.elements?.namedItem("cs2Only");
+    if (cs2 && cs2.type === "checkbox") {
+      data.cs2Only = cs2.checked ? "1" : "0";
+    }
+    return data;
   }
 
   async function deck(formEl) {
     pickerOrder = window.CSToolsMaps.sortMapsChooser(await window.CSToolsMaps.filterMaps(filterPacket(formEl)));
-    redrawPickerDeck();
+    renderPickerGrid();
     syncPickerHUD();
     persistDraft();
   }
 
-  function redrawPickerDeck() {
+  /** Full rebuild after filter/sort/order changes (cheap to recreate nodes). */
+  function renderPickerGrid() {
     ui.pickerGrid.innerHTML = "";
     pickerOrder.forEach((mapItem) => ui.pickerGrid.appendChild(drawPicker(mapItem)));
+  }
 
+  /** Sync selection chrome without nuking cards (avoids thumbnail reload / flash). */
+  function updatePickerSelection(mapId) {
+    if (mapId != null && mapId !== "") {
+      const idStr = String(mapId);
+      const card = [...ui.pickerGrid.children].find((el) => el.dataset.mapId === idStr);
+      if (card) card.classList.toggle("is-selected", staged.has(mapId));
+      return;
+    }
+    pickerOrder.forEach((mapItem) => {
+      const card = [...ui.pickerGrid.children].find((el) => el.dataset.mapId === String(mapItem.id));
+      if (card) card.classList.toggle("is-selected", staged.has(mapItem.id));
+    });
   }
 
   function drawPicker(mapItem) {
@@ -217,12 +339,37 @@
   }
 
   function toggleMap(id) {
-
-    const cap = pickCap();
-    const already = staged.has(id);
-    if (!already && staged.size >= cap) return;
     staged.has(id) ? staged.delete(id) : staged.add(id);
-    redrawPickerDeck();
+    updatePickerSelection(id);
+    syncPickerHUD();
+    persistDraft();
+  }
+
+  /** Fisher–Yates shuffle copy; returns first `take` element values (stable for take ≥ length). */
+  function shuffleTake(ids, take) {
+    const copy = [...ids];
+    const n = Math.min(take, copy.length);
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy.slice(0, n);
+  }
+
+  /** Replace staged set with `pickCap()` random IDs from current `pickerOrder` (filters + sort). */
+  function chooseRandomVisiblePool() {
+    const cap = pickCap();
+    const visibleIds = pickerOrder.map((slot) => slot.id);
+    if (visibleIds.length < cap) {
+      alert(
+        `Not enough maps match your current filters.\nYou need ${cap} maps from the picker list but only ${visibleIds.length} ${
+          visibleIds.length === 1 ? "is" : "are"
+        } visible. Widen filters or clear search, then try again.`,
+      );
+      return;
+    }
+    staged = new Set(shuffleTake(visibleIds, cap));
+    updatePickerSelection();
     syncPickerHUD();
     persistDraft();
   }
@@ -344,6 +491,9 @@
       statuses: { ...node.statuses },
       done: node.done,
 
+      startingSides: { ...(node.startingSides || {}) },
+      sideChooserForMap: [...(node.sideChooserForMap || [])],
+
     };
 
   }
@@ -362,9 +512,46 @@
 
       statuses: Object.fromEntries(ids.map((slug) => [slug, "open"])),
       done: false,
+
+      startingSides: {},
+      sideChooserForMap: [],
     };
 
     return snapshot;
+  }
+
+  function hasStartingSide(snapshot, mapSlug) {
+    const s = snapshot.startingSides;
+    return s && (s[mapSlug] === "T" || s[mapSlug] === "CT");
+  }
+
+  function getSideChooserTeam(snapshot, pickIndex) {
+    const scm = snapshot.sideChooserForMap;
+    if (scm && (scm[pickIndex] === 0 || scm[pickIndex] === 1)) return scm[pickIndex];
+    return (pickIndex + 1) % 2;
+  }
+
+  /** First pick index (in series order) still missing a T/CT start choice. */
+  function firstPendingSideIndex(snapshot) {
+    const picks = snapshot.picks || [];
+    for (let i = 0; i < picks.length; i++) {
+      if (!hasStartingSide(snapshot, picks[i])) return i;
+    }
+    return -1;
+  }
+
+  function allStartingSidesComplete(snapshot) {
+    if (!snapshot.picks?.length) return true;
+    return snapshot.picks.every((slug) => hasStartingSide(snapshot, slug));
+  }
+
+  function resultsOverlayOpen() {
+    return Boolean(document.querySelector(".result-overlay"));
+  }
+
+  function maybeOpenResults(snapshot) {
+    if (!snapshot.done || !allStartingSidesComplete(snapshot) || resultsOverlayOpen()) return;
+    openResults(snapshot);
   }
 
   function persistVeto(snapshot) {
@@ -398,6 +585,22 @@
     markDone(snapshot);
   }
 
+  function deciderStartingSideChooserTeam() {
+    const pickSteps = plan.filter((step) => step.type === "pick");
+    const secondPicker = pickSteps.length >= 2 ? pickSteps[1].team : pickSteps[0]?.team ?? 0;
+    return (secondPicker + 1) % 2;
+  }
+
+  function lotteryStartingSideChooserTeam() {
+    const lotIdx = plan.findIndex((step) => step.type === "lottery_three");
+    if (lotIdx > 0) {
+      for (let j = lotIdx - 1; j >= 0; j--) {
+        if (plan[j].type === "ban") return (plan[j].team + 1) % 2;
+      }
+    }
+    return rotations(meta.format).banSeed % 2;
+  }
+
   function finalizeLottery(snapshot) {
 
     if (!snapshot.remaining.length) return;
@@ -409,6 +612,7 @@
     });
 
     snapshot.picks.push(choiceId);
+    snapshot.sideChooserForMap.push(lotteryStartingSideChooserTeam());
     snapshot.logs.push(`RNG sealed ${title(choiceId)}`);
     snapshot.remaining = [];
   }
@@ -419,6 +623,7 @@
 
     const solo = snapshot.remaining.pop();
     snapshot.picks.push(solo);
+    snapshot.sideChooserForMap.push(deciderStartingSideChooserTeam());
     snapshot.statuses[solo] = "picked";
     snapshot.logs.push(`Decider keeps ${title(solo)}`);
   }
@@ -428,6 +633,9 @@
     const lastId = snapshot.remaining.pop();
     if (!lastId) return;
     snapshot.picks.push(lastId);
+    const bansOnly = plan.filter((step) => step.type === "ban");
+    const lastBanTeam = bansOnly.length ? bansOnly[bansOnly.length - 1].team : rotations(meta.format).banSeed % 2;
+    snapshot.sideChooserForMap.push((lastBanTeam + 1) % 2);
     snapshot.statuses[lastId] = "picked";
     snapshot.logs.push(`${title(lastId)} remains`);
     snapshot.pointer = plan.length;
@@ -453,6 +661,7 @@
     else {
 
       base.picks.push(mapSlug);
+      base.sideChooserForMap.push((cue.team + 1) % 2);
       base.statuses[mapSlug] = "picked";
       base.logs.push(`${label(cue.team)} chose ${title(mapSlug)}`);
 
@@ -465,7 +674,7 @@
     cursorIdx += 1;
     persistVeto(base);
     renderVetoSuite();
-    if (base.done) openResults(base);
+    maybeOpenResults(base);
 
   }
 
@@ -490,7 +699,18 @@
 
   function wipeVeto() {
     localStorage.removeItem(VETO_KEY);
-    chain = [{ remaining: [], picks: [], logs: [], pointer: 0, statuses: {}, done: false }];
+    chain = [
+      {
+        remaining: [],
+        picks: [],
+        logs: [],
+        pointer: 0,
+        statuses: {},
+        done: false,
+        startingSides: {},
+        sideChooserForMap: [],
+      },
+    ];
     cursorIdx = 0;
     plan = [];
   }
@@ -508,6 +728,11 @@
   }
 
   function renderRibbon(snapshot) {
+    if (snapshot.done && !allStartingSidesComplete(snapshot)) {
+      ui.turn.textContent = "Starting sides · choose T or CT";
+      return;
+    }
+
     ui.turn.textContent = snapshot.done ? "Resolved" : step(snapshot)?.type?.toUpperCase() || `Plan ready`;
     if (!snapshot.done && step(snapshot)?.type === "ban") ui.turn.textContent += ` · ${label(step(snapshot).team)}`;
     else if (!snapshot.done && step(snapshot)?.type === "pick") ui.turn.textContent += ` · ${label(step(snapshot).team)}`;
@@ -528,8 +753,21 @@
 
     const preview = document.createElement("div");
     preview.className = "veto-indicator";
-    if (canAct && cue.type === "ban") preview.innerHTML = `<span class="ban">✕</span>`;
-    if (canAct && cue.type === "pick") preview.innerHTML = `<span class="pick">✔</span>`;
+    if (canAct && cue.type === "ban") preview.innerHTML = `<span class="ban-done">✕</span>`;
+    if (canAct && cue.type === "pick") preview.innerHTML = `<span class="pick-done">✔</span>`;
+
+    let appliedTint = null;
+    const st = snapshot.statuses[mapItem.id];
+    if (st === "banned" || st === "picked") {
+      appliedTint = document.createElement("div");
+      appliedTint.className =
+        st === "banned" ? "veto-applied-tint veto-applied-tint--ban" : "veto-applied-tint veto-applied-tint--pick";
+      appliedTint.setAttribute("aria-hidden", "true");
+    }
+
+    if (canAct) {
+      card.dataset.vetoCue = cue.type;
+    }
 
     const thumbImg = document.createElement("img");
     thumbImg.className = `map-card-thumb is-visible`;
@@ -564,6 +802,7 @@
     if (canAct) card.addEventListener("click", () => commitMove(mapItem.id));
 
     card.appendChild(thumbImg);
+    if (appliedTint) card.appendChild(appliedTint);
     card.appendChild(preview);
     card.appendChild(halo);
     card.appendChild(wrapCtl);
@@ -589,33 +828,234 @@
 
     ui.undo.disabled = cursorIdx <= 0;
     ui.redo.disabled = cursorIdx >= chain.length - 1;
+
+    syncSidePickDock(snap);
   }
 
-  function summarizePayload(built, journal) {
+  function commitStartingSide(choice) {
+    if (choice !== "T" && choice !== "CT") return;
+    const snap = chain[cursorIdx];
+    const idx = firstPendingSideIndex(snap);
+    if (idx < 0) return;
 
-    let sidesWrap = null;
-    let roster = null;
+    const mapId = snap.picks[idx];
+    const base = dup(snap);
+    base.startingSides = { ...base.startingSides, [mapId]: choice };
+    const chooser = getSideChooserTeam(snap, idx);
+    base.logs.push(`${label(chooser)} chose ${choice} start on ${title(mapId)}`);
+
+    chain = chain.slice(0, cursorIdx + 1);
+    chain.push(base);
+    cursorIdx += 1;
+    persistVeto(base);
+    renderVetoSuite();
+    maybeOpenResults(base);
+  }
+
+  function syncSidePickDock(snapshot) {
+    const dock = ui.sidePickDock;
+    if (!dock) return;
+
+    const idx = firstPendingSideIndex(snapshot);
+    if (idx < 0) {
+      dock.hidden = true;
+      dock.innerHTML = "";
+      return;
+    }
+
+    const mapId = snapshot.picks[idx];
+    const chooserTeam = getSideChooserTeam(snapshot, idx);
+    const who = label(chooserTeam);
+
+    dock.hidden = false;
+    dock.innerHTML = `
+      <div class="veto-side-pick-dock__inner">
+        <div class="veto-side-pick-dock__copy">
+          <span class="veto-side-pick-dock__eyebrow">Starting side</span>
+          <strong class="veto-side-pick-dock__map">${escapeHtml(title(mapId))}</strong>
+          <span class="veto-side-pick-dock__who"><span class="veto-side-pick-dock__team">${escapeHtml(who)}</span> choose T or CT</span>
+        </div>
+        <div class="veto-side-pick-dock__actions" role="group" aria-label="Starting side">
+          <button type="button" class="button veto-side-btn veto-side-btn--t" data-side="T">T</button>
+          <button type="button" class="button veto-side-btn veto-side-btn--ct" data-side="CT">CT</button>
+        </div>
+      </div>`;
+
+    dock.querySelectorAll("[data-side]").forEach((btn) => {
+      btn.addEventListener("click", () => commitStartingSide(btn.getAttribute("data-side")));
+    });
+  }
+
+  function parseCsToolsTeamsPersisted() {
     try {
-      sidesWrap = JSON.parse(localStorage.getItem("cs-tools-teams") || "{}").sides || null;
+      const raw = localStorage.getItem("cs-tools-teams");
+      if (raw === null || raw === "") return { sides: null, players: [] };
+      const blob = JSON.parse(raw);
+      if (!blob || typeof blob !== "object") return { sides: null, players: [] };
 
-      roster = JSON.parse(localStorage.getItem("cs-tools-teams") || "{}").players || null;
+      let sides = null;
+      if (blob.sides && typeof blob.sides === "object") {
+        sides = {
+          team1: blob.sides.team1 === "T" || blob.sides.team1 === "CT" ? blob.sides.team1 : null,
+          team2: blob.sides.team2 === "T" || blob.sides.team2 === "CT" ? blob.sides.team2 : null,
+        };
+      }
 
+      const players = Array.isArray(blob.players) ? blob.players : [];
+      return { sides, players };
     } catch (_) {
-      sidesWrap = null;
+      return { sides: null, players: [] };
+    }
+  }
+
+  function classifyTeamLane(chip) {
+    const raw = chip?.location ?? chip?.slot ?? chip?.team ?? chip?.lane ?? chip?.assignment ?? chip?.squad;
+    if (raw === 0 || raw === "0") return "team1";
+    if (raw === 1 || raw === "1") return "team2";
+    const slug = String(raw ?? "")
+      .trim()
+      .toLowerCase()
+      .replace(/\s+|_/g, "");
+    if (slug === "team1" || slug === "t1" || slug === "a" || slug === "attackers") return "team1";
+    if (slug === "team2" || slug === "t2" || slug === "b" || slug === "defenders") return "team2";
+    if (slug === "pool" || slug === "bench" || slug === "unassigned" || slug === "freeagent") return "pool";
+    return "";
+  }
+
+  /** Ordered name lists derived from persisted chips (canonical team1 / team2). */
+  function teamRostersFromPlayers(players) {
+    const team1 = [];
+    const team2 = [];
+    if (!Array.isArray(players)) return { team1, team2 };
+
+    players.forEach((chip) => {
+      if (!chip || typeof chip !== "object") return;
+      const name = String(chip.name ?? chip.label ?? chip.nick ?? "").trim();
+      if (!name) return;
+      const lane = classifyTeamLane(chip);
+      if (lane === "team1") team1.push(name);
+      else if (lane === "team2") team2.push(name);
+    });
+    return { team1, team2 };
+  }
+
+  /**
+   * Pick slice for match summary payload + result overlay.
+   * startingSides[slug] records the veto side-chooser team's starting role (T|CT).
+   * sideChooserForMap[pickIndex] is team index (0|1) of who chose.
+   */
+  function perMapSummarizeSlice(slugEntry, pickIndex, snapshot, teamLabelsTwo) {
+    const startingSide = snapshot?.startingSides?.[slugEntry] ?? null;
+
+    let sideChooserTeamIdx = null;
+    const scm = snapshot?.sideChooserForMap;
+    if (scm && (scm[pickIndex] === 0 || scm[pickIndex] === 1)) sideChooserTeamIdx = scm[pickIndex];
+
+    const L = Array.isArray(teamLabelsTwo)
+      ? teamLabelsTwo.map((t) => String(t ?? "").trim() || `Team ?`)
+      : ["Team 1", "Team 2"];
+
+    let teamStartingSides = null;
+    let startsTTeam = null;
+    let startsCTTeam = null;
+
+    const chooserKnown = sideChooserTeamIdx === 0 || sideChooserTeamIdx === 1;
+    if (chooserKnown && (startingSide === "T" || startingSide === "CT")) {
+      const other = startingSide === "T" ? "CT" : "T";
+      const role0 = sideChooserTeamIdx === 0 ? startingSide : other;
+      const role1 = sideChooserTeamIdx === 1 ? startingSide : other;
+      teamStartingSides = [
+        { teamIdx: 0, label: L[0], role: role0 },
+        { teamIdx: 1, label: L[1], role: role1 },
+      ];
+      startsTTeam = role0 === "T" ? L[0] : L[1];
+      startsCTTeam = role0 === "CT" ? L[0] : L[1];
     }
 
     return {
+      id: slugEntry,
+      name: title(slugEntry),
+      startingSide,
+      sideChooserTeamIdx,
+      teamStartingSides,
+      startsTTeam,
+      startsCTTeam,
+      teamLabels: [L[0], L[1]],
+    };
+  }
 
-      team1Name: ui.t1.value,
-      team2Name: ui.t2.value,
+  /**
+   * Two caption lines ordered by team index (team 0, then team 1). Null when no dual starting-side data.
+   * @returns {string[] | null}
+   */
+  function getDualStartingSideRows(mapRow) {
+    if (!mapRow || typeof mapRow !== "object") return null;
 
-      maps: built.map((slugEntry) => ({ id: slugEntry, name: title(slugEntry) })),
+    if (
+      Array.isArray(mapRow.teamStartingSides) &&
+      mapRow.teamStartingSides.length === 2 &&
+      mapRow.teamStartingSides.every((row) => row && (row.role === "T" || row.role === "CT"))
+    ) {
+      const sorted = [...mapRow.teamStartingSides].sort((a, b) => a.teamIdx - b.teamIdx);
+      return sorted.map((row) => `${row.label} starts ${row.role}`);
+    }
+
+    const tStarter = typeof mapRow.startsTTeam === "string" ? mapRow.startsTTeam.trim() : "";
+    const ctStarter = typeof mapRow.startsCTTeam === "string" ? mapRow.startsCTTeam.trim() : "";
+    if (!tStarter || !ctStarter) return null;
+
+    const L = Array.isArray(mapRow.teamLabels)
+      ? mapRow.teamLabels.map((item) => String(item ?? "").trim()).filter(Boolean)
+      : [];
+
+    const roleForLabel = (lab) => {
+      const n = lab.toLowerCase();
+      if (n === tStarter.toLowerCase()) return "T";
+      if (n === ctStarter.toLowerCase()) return "CT";
+      return null;
+    };
+
+    if (L.length >= 2) {
+      const r0 = roleForLabel(L[0]);
+      const r1 = roleForLabel(L[1]);
+      if (r0 && r1) return [`${L[0]} starts ${r0}`, `${L[1]} starts ${r1}`];
+    }
+
+    return [`${tStarter} starts T`, `${ctStarter} starts CT`];
+  }
+
+  function summarizePayload(built, journal, snapshot) {
+    const teams = parseCsToolsTeamsPersisted();
+    const rosterPlayers = teams.players.slice();
+    const teamRosters = teamRostersFromPlayers(rosterPlayers);
+    const persistedCfg = read(CFG_KEY, {});
+    const fromBlob = teamTitlesFromTeamsBlob();
+    const fallback1 =
+      ui.t1.value.trim() ||
+      (typeof persistedCfg.team1Name === "string" && persistedCfg.team1Name.trim()) ||
+      fromBlob.team1 ||
+      "Team 1";
+    const fallback2 =
+      ui.t2.value.trim() ||
+      (typeof persistedCfg.team2Name === "string" && persistedCfg.team2Name.trim()) ||
+      fromBlob.team2 ||
+      "Team 2";
+
+    const labelPair = [fallback1.slice(0, 72), fallback2.slice(0, 72)];
+
+    return {
+
+      team1Name: labelPair[0],
+      team2Name: labelPair[1],
+
+      maps: built.map((slugEntry, pickIndex) => perMapSummarizeSlice(slugEntry, pickIndex, snapshot, labelPair)),
 
       history: journal,
 
-      sides: sidesWrap,
+      sides: teams.sides,
 
-      roster,
+      roster: rosterPlayers,
+      teamRosters,
 
       bothMode: Boolean(readCfg().bothFlow || bothHints()),
     };
@@ -623,7 +1063,7 @@
   }
 
   function openResults(snapshot) {
-    const payload = summarizePayload(snapshot.picks, snapshot.logs.slice());
+    const payload = summarizePayload(snapshot.picks, snapshot.logs.slice(), snapshot);
     if (payload.bothMode) sessionStorage.setItem(SUMMARY_KEY, JSON.stringify(payload));
     else sessionStorage.removeItem(SUMMARY_KEY);
 
@@ -644,19 +1084,28 @@
     document.body.appendChild(overlay);
 
     const stackMount = overlay.querySelector("#stack");
+    const overlayLabelPair = [payload.team1Name, payload.team2Name];
     snapshot.picks.forEach((slugWrap, ordinal) =>
-      stackMount.appendChild(bigCard(slugWrap, ordinal + 1)),
+      stackMount.appendChild(
+        bigCard(
+          slugWrap,
+          ordinal + 1,
+          perMapSummarizeSlice(slugWrap, ordinal, snapshot, overlayLabelPair),
+        ),
+      ),
     );
     overlay.querySelector("#ledger").textContent = snapshot.logs.slice(-320).join("\n");
     overlay.querySelector("#cta").addEventListener("click", () => {
       overlay.remove();
+      localStorage.removeItem(VETO_KEY);
       window.location.href = payload.bothMode ? "match-summary.html" : "index.html";
 
     });
 
   }
 
-  function bigCard(id, slot) {
+  /** @param mapRow slice from {@link perMapSummarizeSlice} */
+  function bigCard(id, slot, mapRow) {
 
     const box = document.createElement("figure");
     box.className = "summary-large-card result-map-card";
@@ -672,7 +1121,34 @@
     const captionNode = document.createElement("figcaption");
     captionNode.className = `map-card-title`;
     captionNode.style.marginTop = `8px`;
-    captionNode.textContent = `${slot}. ${title(id)}`;
+
+    const primaryLine = document.createElement("span");
+    primaryLine.className = `map-caption-primary`;
+    primaryLine.textContent = `${slot}. ${title(id)}`;
+    captionNode.appendChild(primaryLine);
+
+    const dualRows = getDualStartingSideRows(mapRow);
+    const rawSide =
+      typeof mapRow?.startingSide === "string" &&
+      !dualRows &&
+      (mapRow.startingSide === "T" || mapRow.startingSide === "CT")
+        ? mapRow.startingSide
+        : null;
+
+    if (dualRows || rawSide) {
+      const sub = document.createElement("div");
+      sub.className = `map-caption-dual-side`;
+      if (dualRows) {
+        dualRows.forEach((line) => {
+          const row = document.createElement("span");
+          row.className = `map-caption-dual-side-line`;
+          row.textContent = line;
+          sub.appendChild(row);
+        });
+      } else sub.textContent = `Start ${rawSide}`;
+      captionNode.appendChild(sub);
+    }
+
     box.appendChild(surface);
 
     box.appendChild(captionNode);
@@ -697,16 +1173,23 @@
     faux.remaining = [];
 
     faux.picks = pickedSubset.slice();
+    faux.sideChooserForMap = pickedSubset.map((_, ord) => (ord + 1) % 2);
     faux.logs.push(`RNG pulled ${pickedSubset.map((slugLabel) => title(slugLabel)).join(", ")}`);
     faux.done = true;
 
     meta.format = meta.format || "random_pick";
 
+    chain = [faux];
+    cursorIdx = 0;
+
     persistVeto(faux);
 
     persistDraft();
 
-    openResults(faux);
+    ui.pickPanel.classList.add("substate-hidden");
+    ui.vetoPanel.classList.remove("substate-hidden");
+    renderVetoSuite();
+    maybeOpenResults(faux);
   }
 
   function launchSequence() {
@@ -738,7 +1221,7 @@
     ui.pickPanel.classList.add("substate-hidden");
     ui.vetoPanel.classList.remove("substate-hidden");
     renderVetoSuite();
-    if (chain[cursorIdx].done) openResults(chain[cursorIdx]);
+    maybeOpenResults(chain[cursorIdx]);
 
   }
 
@@ -747,6 +1230,10 @@
     if (question !== false && !confirm("Discard veto progression?")) return;
     ui.vetoPanel.classList.add("substate-hidden");
     ui.pickPanel.classList.remove("substate-hidden");
+    if (ui.sidePickDock) {
+      ui.sidePickDock.hidden = true;
+      ui.sidePickDock.innerHTML = "";
+    }
 
     wipeVeto();
     hydrateAtlas().then(deck.bind(null, ui.filters));
@@ -776,17 +1263,34 @@
 
     if (cfg.filters) {
       Object.entries(cfg.filters).forEach(([fname, payload]) => {
-        const ctl = ui.filters.elements.namedItem(fname);
-        if (ctl && ctl.value !== undefined) ctl.value = payload;
+        const ctl =
+          ui.filters.elements.namedItem(fname) || ui.configForm?.elements?.namedItem(fname);
+        if (!ctl) return;
+        if (ctl.type === "checkbox") {
+          const truthy = payload === "1" || payload === 1 || payload === true;
+          const str = String(payload ?? "").trim().toLowerCase();
+          ctl.checked = truthy || str === "true" || str === "on";
+          return;
+        }
+        if (ctl.value !== undefined) ctl.value = payload;
       });
-
     }
 
+    const cs2OnlyCtl =
+      ui.configForm?.elements?.namedItem("cs2Only") || ui.filters.elements.namedItem("cs2Only");
+    if (
+      cs2OnlyCtl &&
+      cs2OnlyCtl.type === "checkbox" &&
+      (!cfg.filters || !Object.prototype.hasOwnProperty.call(cfg.filters, "cs2Only"))
+    ) {
+      cs2OnlyCtl.checked = true;
+    }
   }
 
   async function bootstrap() {
 
     window.CSToolsNav?.init(".site-menu");
+    ui.configForm = document.getElementById("config-form");
     ui.pickPanel = document.getElementById("panel-selection");
     ui.vetoPanel = document.getElementById("panel-veto");
     ui.turn = document.getElementById("turn-label");
@@ -795,6 +1299,8 @@
     ui.vetoDeck = document.getElementById("veto-grid");
     ui.pickerGrid = document.getElementById("picker-grid");
     ui.counter = document.getElementById("picker-count-banner");
+    ui.randomPool = document.getElementById("random-pool-btn");
+    ui.deselectAll = document.getElementById("deselect-all-btn");
     ui.go = document.getElementById("go-veto-btn");
 
     ui.t1 = document.getElementById("team-one-name");
@@ -820,6 +1326,8 @@
 
     ui.redo = document.getElementById("redo-action");
 
+    ui.sidePickDock = document.getElementById("side-pick-dock");
+
     const filterRoot = document.getElementById("picker-filters");
     buildFilters(filterRoot);
     ui.filters = filterRoot;
@@ -829,6 +1337,15 @@
     document.getElementById("reset-veto")?.addEventListener("click", () => resetToPicker(true));
 
     document.getElementById("back-to-picker")?.addEventListener("click", () => resetToPicker(true));
+
+    ui.randomPool?.addEventListener("click", chooseRandomVisiblePool);
+
+    ui.deselectAll?.addEventListener("click", () => {
+      staged.clear();
+      updatePickerSelection();
+      syncPickerHUD();
+      persistDraft();
+    });
 
     ui.go?.addEventListener("click", () => {
       if (staged.size !== capValue()) {
@@ -863,10 +1380,30 @@
       }),
     );
 
+    ui.configForm?.elements?.namedItem("cs2Only")?.addEventListener("change", async () => {
+      await hydrateAtlas();
+      await deck(ui.filters);
+      syncPickerHUD();
+      persistDraft();
+    });
+
     await hydrateAtlas();
-    await hydrateSelects(ui.filters);
     const cfgDraft = readCfg();
+    // Order matters: hydrate hidden inputs from saved cfg.filters BEFORE the
+    // multiselect factory reads them so checkbox state mirrors restored values.
     hydratePicker(cfgDraft);
+    ui.multiSelects = await setupMultiSelects(ui.filters);
+
+    document.addEventListener("click", (event) => {
+      (ui.multiSelects || []).forEach((ms) => {
+        if (ms.isOpen() && !ms.root.contains(event.target)) ms.close();
+      });
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") return;
+      (ui.multiSelects || []).forEach((ms) => ms.close());
+    });
+
     await deck(ui.filters);
     persistCfg({ ...cfgDraft, selections: [...staged], bothFlow: cfgDraft.bothFlow });
     persistDraft();
@@ -895,6 +1432,50 @@
 
     if (prose && readCfg().bothFlow)
       prose.textContent = `Combined matchup path — Accept routes into the condensed recap sheet.`;
+
+    /*
+     * Query resetVeto=1: defense-in-depth after combined lock-in (choose-team also clears cs-tools-veto).
+     * Strip param so refresh does not rely on it. Map-only flows omit this and keep veto resume on reload.
+     * Verify: open choose-map?mode=both&resetVeto=1 with leftover veto in localStorage → picker visible.
+     */
+    try {
+      const url = new URL(window.location.href);
+      if (url.searchParams.get("resetVeto") === "1") {
+        wipeVeto();
+        url.searchParams.delete("resetVeto");
+        const next = url.pathname + (url.searchParams.toString() ? `?${url.searchParams.toString()}` : "") + url.hash;
+        history.replaceState(null, "", next);
+      }
+    } catch (_) {}
+
+    const vRestore = read(VETO_KEY, null);
+    if (vRestore?.meta && vRestore.snapshot) {
+      meta = vRestore.meta;
+      plan = Array.isArray(vRestore.plan) ? vRestore.plan : [];
+      const sn = dup(vRestore.snapshot);
+      if (!sn.startingSides) sn.startingSides = {};
+      if (!Array.isArray(sn.sideChooserForMap)) sn.sideChooserForMap = [];
+      while (sn.sideChooserForMap.length < sn.picks.length) {
+        sn.sideChooserForMap.push((sn.sideChooserForMap.length + 1) % 2);
+      }
+      if (sn.sideChooserForMap.length > sn.picks.length) {
+        sn.sideChooserForMap = sn.sideChooserForMap.slice(0, sn.picks.length);
+      }
+      staged = new Set([...(sn.remaining || []), ...(sn.picks || [])]);
+      chain = [sn];
+      cursorIdx = 0;
+      const hasVeto =
+        (sn.remaining && sn.remaining.length > 0) ||
+        (sn.picks && sn.picks.length > 0) ||
+        (typeof sn.pointer === "number" && sn.pointer > 0) ||
+        (plan && plan.length > 0);
+      if (hasVeto || sn.done) {
+        ui.pickPanel.classList.add("substate-hidden");
+        ui.vetoPanel.classList.remove("substate-hidden");
+        renderVetoSuite();
+        maybeOpenResults(sn);
+      }
+    }
   }
 
   if (document.readyState === `loading`)

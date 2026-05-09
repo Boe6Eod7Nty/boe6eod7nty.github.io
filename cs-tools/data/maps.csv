@@ -1,35 +1,35 @@
 id,name,versions,added_date,in_cs2,cs2_type,workshop_links,tags,thumbnail,notes
-de_dust2,Dust II,CS:GO|CS2,2012,true,official,,bomb_defusal|active_duty|5v5,,Remade visually in 2017
-de_mirage,Mirage,CS:GO|CS2,2013,true,official,,bomb_defusal|active_duty|5v5,,
-de_inferno,Inferno,CS:GO|CS2,2012,true,official,,bomb_defusal|active_duty|5v5,,Remade in 2016 and CS2
-de_nuke,Nuke,CS:GO|CS2,2012,true,official,,bomb_defusal|active_duty|5v5,,Remade visually in 2016
-de_overpass,Overpass,CS:GO|CS2,2013,true,official,,bomb_defusal|active_duty|5v5,,
-de_vertigo,Vertigo,CS:GO|CS2,2012,true,official,,bomb_defusal|active_duty|5v5,,Reworked in 2019
-de_ancient,Ancient,CS:GO|CS2,2020,true,official,,bomb_defusal|active_duty|5v5,,Operation Broken Fang
-de_anubis,Anubis,CS:GO|CS2,2020,true,official,,bomb_defusal|active_duty|5v5,,Community map purchased by Valve
-de_train,Train,CS:GO|CS2,2012,true,official,,bomb_defusal|5v5,,Remade in 2014
-de_cache,Cache,CS:GO|CS2,2013,true,community,,bomb_defusal|5v5,,Added to CS2 in April 2026
-de_cobblestone,Cobblestone,CS:GO,2013,false,none,,bomb_defusal|5v5,,Removed from Active Duty in 2018
-de_aztec,Aztec,CS:GO,2012,false,none,,bomb_defusal|5v5,,Removed from official MM in 2017
-de_dust,Dust,CS:GO,2012,false,none,,bomb_defusal|5v5,,Removed from official MM in 2017
-cs_office,Office,CS:GO|CS2,2012,true,official,,hostage_rescue|5v5,,
-cs_italy,Italy,CS:GO|CS2,2012,true,official,,hostage_rescue|5v5,,Expanded heavily in CS2
-cs_assault,Assault,CS:GO,2013,false,none,,hostage_rescue|5v5,,
-cs_militia,Militia,CS:GO,2013,false,none,,hostage_rescue|5v5,,
-cs_agency,Agency,CS:GO,2013,false,none,,hostage_rescue|5v5,,Community map from Operation Bravo
-ar_baggage,Baggage,CS:GO|CS2,2012,true,official,,arms_race,,
-ar_shoots,Shoots,CS:GO|CS2,2012,true,official,,arms_race,,
+de_dust2,Dust II,CS:GO|CS2,2012,true,official,,bomb_defusal|active_duty|5v5,images/Cs2_dust2.webp,Remade visually in 2017
+de_mirage,Mirage,CS:GO|CS2,2013,true,official,,bomb_defusal|active_duty|5v5,images/De_mirage_cs2.webp,
+de_inferno,Inferno,CS:GO|CS2,2012,true,official,,bomb_defusal|active_duty|5v5,images/Cs2_inferno_remake.webp,Remade in 2016 and CS2
+de_nuke,Nuke,CS:GO|CS2,2012,true,official,,bomb_defusal|active_duty|5v5,images/De_nuke_cs2.webp,Remade visually in 2016
+de_overpass,Overpass,CS:GO|CS2,2013,true,official,,bomb_defusal|active_duty|5v5,images/Overpass_loading_screen.webp,
+de_vertigo,Vertigo,CS:GO|CS2,2012,true,official,,bomb_defusal|active_duty|5v5,images/De_vertigo_cs2.webp,Reworked in 2019
+de_ancient,Ancient,CS:GO|CS2,2020,true,official,,bomb_defusal|active_duty|5v5,images/De_ancient_cs2.webp,Operation Broken Fang
+de_anubis,Anubis,CS:GO|CS2,2020,true,official,,bomb_defusal|active_duty|5v5,images/CS2_Anubis_B_site.webp,Community map purchased by Valve
+de_train,Train,CS:GO|CS2,2012,true,official,,bomb_defusal|5v5,images/De_train_cs2_new.webp,Remade in 2014
+de_cache,Cache,CS:GO|CS2,2013,true,community,,bomb_defusal|5v5,images/De_cache_cs2.webp,Added to CS2 in April 2026
+de_cbble,Cobblestone,CS|CSS|CS:GO|CS2*,2000,false,none,https://steamcommunity.com/sharedfiles/filedetails/?id=3070293560,bomb_defusal|5v5,images/De_cbble_s2.webp,Merged id; workshop on CS2
+de_aztec,Aztec,CS:GO,2012,false,none,,bomb_defusal|5v5,images/Csgo-de-aztec.webp,Removed from official MM in 2017
+de_dust,Dust,CS:GO,2012,false,none,,bomb_defusal|5v5,images/Csgo-de-dust.webp,Removed from official MM in 2017
+cs_office,Office,CS:GO|CS2,2012,true,official,,hostage_rescue|5v5,images/Cs2_office.webp,
+cs_italy,Italy,CS:GO|CS2,2012,true,official,,hostage_rescue|5v5,images/Cs2_italy.webp,Expanded heavily in CS2
+cs_assault,Assault,CS:GO,2013,false,none,,hostage_rescue|5v5,images/Cs_assault_go.webp,
+cs_militia,Militia,CS|CSS|CS:GO|CS2*,2013,true,community,https://steamcommunity.com/sharedfiles/filedetails/?id=3089953774,hostage_rescue|5v5,images/militia_62f41d2245e8b.jpg,
+cs_agency,Agency,CS:GO,2013,false,none,,hostage_rescue|5v5,images/Cs2_agency_thumbnail.webp,Community map from Operation Bravo
+ar_baggage,Baggage,CS:GO|CS2,2012,true,official,,arms_race,images/Ar_baggage_png.webp,
+ar_shoots,Shoots,CS:GO|CS2,2012,true,official,,arms_race,images/Ar_shoots_png.webp,
 ar_monastery,Monastery,CS:GO,2012,false,none,,arms_race,,
 ar_lunacy,Lunacy,CS:GO,2019,false,none,,arms_race,,Operation Shattered Web
 ar_dizzy,Dizzy,CS:GO,2017,false,none,,arms_race,,Operation Hydra
-de_lake,Lake,CS:GO,2012,false,none,,demolition|wingman,,
+de_lake,Lake,CS:GO,2012,false,none,,demolition|wingman,images/De_lake_cs2.webp,
 de_bank,Bank,CS:GO,2012,false,none,,demolition,,
 de_safehouse,Safehouse,CS:GO,2012,false,none,,demolition,,
 de_sugarcane,Sugarcane,CS:GO,2012,false,none,,demolition,,
 de_stmarc,St. Marc,CS:GO,2012,false,none,,demolition,,
-de_shortdust,Shortdust,CS:GO,2014,false,none,,demolition|wingman,,
+de_shortdust,Shortdust,CS:GO,2014,false,none,,demolition|wingman,images/De_shortdust_cs2.webp,
 de_shortnuke,Shortnuke,CS:GO,2018,false,none,,wingman,,
-de_canals,Canals,CS:GO,2017,false,none,,bomb_defusal|5v5,,
+de_canals,Canals,CS:GO,2017,false,none,,bomb_defusal|5v5,images/De_canals_cs2.webp,
 dz_blacksite,Blacksite,CS:GO,2018,false,none,,danger_zone,,First Danger Zone map
 dz_sirocco,Sirocco,CS:GO,2019,false,none,,danger_zone,,
 dz_junglety,Jungle,CS:GO,2019,false,none,,danger_zone,,
@@ -41,67 +41,67 @@ de_boyard,Boyard,CS:GO,2022,false,none,,wingman,,
 de_chalice,Chalice,CS:GO,2022,false,none,,wingman,,
 de_crete,Crete,CS:GO,2022,false,none,,wingman,,
 de_hive,Hive,CS:GO,2022,false,none,,wingman,,
-de_iris,Iris,CS:GO,2022,false,none,,bomb_defusal|5v5,,
-de_chlorine,Chlorine,CS:GO,2020,false,none,,bomb_defusal|5v5,,
-de_mutiny,Mutiny,CS:GO,2020,false,none,,bomb_defusal|5v5,,
-de_swamp,Swamp,CS:GO,2020,false,none,,bomb_defusal|5v5,,
-de_engage,Engage,CS:GO,2020,false,none,,bomb_defusal|5v5,,
-cs_apollo,Apollo,CS:GO,2020,false,none,,hostage_rescue|5v5,,
-de_mocha,Mocha,CS:GO,2021,false,none,,bomb_defusal|5v5,,
-de_grind,Grind,CS:GO,2021,false,none,,bomb_defusal|5v5,,
-de_basalt,Basalt,CS:GO,2021,false,none,,bomb_defusal|5v5,,
-cs_insertion2,Insertion II,CS:GO,2021,false,none,,hostage_rescue|5v5,,
-cs_insertion,Insertion,CS:GO,2014,false,none,,hostage_rescue|5v5,,Operation Breakout
-de_season,Season,CS:GO,2014,false,none,,bomb_defusal|5v5,,
-de_santorini,Santorini,CS:GO,2016,false,none,,bomb_defusal|5v5,,Remade as Thera in CS2
-de_biome,Biome,CS:GO,2018,false,none,,bomb_defusal|5v5,,
-de_subzero,Subzero,CS:GO,2018,false,none,,bomb_defusal|5v5,,
-de_abbey,Abbey,CS:GO,2019,false,none,,bomb_defusal|5v5,,
-de_ruby,Ruby,CS:GO,2019,false,none,,bomb_defusal|5v5,,
-de_breach,Breach,CS:GO,2019,false,none,,bomb_defusal|5v5,,
-de_studio,Studio,CS:GO,2019,false,none,,bomb_defusal|5v5,,
-de_austria,Austria,CS:GO,2017,false,none,,bomb_defusal|5v5,,
-de_shipped,Shipped,CS:GO,2017,false,none,,bomb_defusal|5v5,,
-de_lite,Lite,CS:GO,2017,false,none,,bomb_defusal|5v5,,
-de_thrill,Thrill,CS:GO,2017,false,none,,bomb_defusal|5v5,,
-cs_workout,Workout,CS:GO,2014,false,none,,hostage_rescue|5v5,,
-de_ali,Ali,CS:GO,2013,false,none,,bomb_defusal|5v5,,
-cs_motel,Motel,CS:GO,2013,false,none,,hostage_rescue|5v5,,
-cs_museum,Museum,CS:GO,2013,false,none,,hostage_rescue|5v5,,
-de_favela,Favela,CS:GO,2013,false,none,,bomb_defusal|5v5,,
-de_library,Library,CS:GO,2013,false,none,,bomb_defusal|5v5,,
-de_seaside,Seaside,CS:GO,2013,false,none,,bomb_defusal|5v5,,
-de_thunder,Thunder,CS:GO,2013,false,none,,bomb_defusal|5v5,,
-de_chinatown,Chinatown,CS:GO,2013,false,none,,bomb_defusal|5v5,,
-de_gwalior,Gwalior,CS:GO,2013,false,none,,bomb_defusal|5v5,,
-de_ruins,Ruins,CS:GO,2013,false,none,,bomb_defusal|5v5,,
-de_siege,Siege,CS:GO,2013,false,none,,bomb_defusal|5v5,,
-cs_rush,Rush,CS:GO,2014,false,none,,hostage_rescue|5v5,,
-de_blackgold,Black Gold,CS:GO,2014,false,none,,bomb_defusal|5v5,,
-de_castle,Castle,CS:GO,2014,false,none,,bomb_defusal|5v5,,
-de_mist,Mist,CS:GO,2014,false,none,,bomb_defusal|5v5,,
-de_overgrown,Overgrown,CS:GO,2014,false,none,,bomb_defusal|5v5,,
-cs_backalley,Back Alley,CS:GO,2014,false,none,,hostage_rescue|5v5,,
-de_bazaar,Bazaar,CS:GO,2014,false,none,,bomb_defusal|5v5,,
-de_facade,Facade,CS:GO,2014,false,none,,bomb_defusal|5v5,,
-de_marquis,Marquis,CS:GO,2014,false,none,,bomb_defusal|5v5,,
-de_log,Log,CS:GO,2015,false,none,,bomb_defusal|5v5,,
-de_rails,Rails,CS:GO,2015,false,none,,bomb_defusal|5v5,,
-de_resort,Resort,CS:GO,2015,false,none,,bomb_defusal|5v5,,
-de_zoo,Zoo,CS:GO,2015,false,none,,bomb_defusal|5v5,,
-cs_cruise,Cruise,CS:GO,2016,false,none,,hostage_rescue|5v5,,
-de_coast,Coast,CS:GO,2016,false,none,,bomb_defusal|5v5,,
-de_empire,Empire,CS:GO,2016,false,none,,bomb_defusal|5v5,,
-de_mikla,Mikla,CS:GO,2016,false,none,,bomb_defusal|5v5,,
-de_royal,Royal,CS:GO,2016,false,none,,bomb_defusal|5v5,,
-de_tulip,Tulip,CS:GO,2016,false,none,,bomb_defusal|5v5,,
+de_iris,Iris,CS:GO,2022,false,none,,bomb_defusal|5v5,images/De_iris.webp,
+de_chlorine,Chlorine,CS:GO,2020,false,none,,bomb_defusal|5v5,images/De_chlorine.webp,
+de_mutiny,Mutiny,CS:GO,2020,false,none,,bomb_defusal|5v5,images/De_mutiny.webp,
+de_swamp,Swamp,CS:GO,2020,false,none,,bomb_defusal|5v5,images/De_swamp.webp,
+de_engage,Engage,CS:GO,2020,false,none,,bomb_defusal|5v5,images/De_engage.webp,
+cs_apollo,Apollo,CS:GO,2020,false,none,,hostage_rescue|5v5,images/Cs_apollo.webp,
+de_mocha,Mocha,CS:GO,2021,false,none,,bomb_defusal|5v5,images/Csgo_map_Mocha.webp,
+de_grind,Grind,CS:GO,2021,false,none,,bomb_defusal|5v5,images/Csgo_grind_map.webp,
+de_basalt,Basalt,CS:GO,2021,false,none,,bomb_defusal|5v5,images/De_basalt_cs2.webp,
+cs_insertion2,Insertion II,CS:GO,2021,false,none,,hostage_rescue|5v5,images/Cs_insertion2.webp,
+cs_insertion,Insertion,CS:GO,2014,false,none,,hostage_rescue|5v5,images/Cs_insertion_thumbnail.webp,Operation Breakout
+de_season,Season,CS:GO,2014,false,none,,bomb_defusal|5v5,images/Csgo_de_season-promo.webp,
+de_santorini,Santorini,CS:GO,2016,false,none,,bomb_defusal|5v5,images/Csgo-santorini-workshop.webp,Remade as Thera in CS2
+de_biome,Biome,CS:GO,2018,false,none,,bomb_defusal|5v5,images/De_biome.webp,
+de_subzero,Subzero,CS:GO,2018,false,none,,bomb_defusal|5v5,images/De_subzero.webp,
+de_abbey,Abbey,CS:GO,2019,false,none,,bomb_defusal|5v5,images/2186934885_preview_abbey12.png,
+de_ruby,Ruby,CS:GO,2019,false,none,,bomb_defusal|5v5,images/Ruby.webp,
+de_breach,Breach,CS:GO,2019,false,none,,bomb_defusal|5v5,images/De_breach.webp,
+de_studio,Studio,CS:GO,2019,false,none,,bomb_defusal|5v5,images/De_studio.webp,
+de_austria,Austria,CS:GO,2017,false,none,,bomb_defusal|5v5,images/De_austria.webp,
+de_shipped,Shipped,CS:GO,2017,false,none,,bomb_defusal|5v5,images/De_shipped_thumbnail.webp,
+de_lite,Lite,CS:GO,2017,false,none,,bomb_defusal|5v5,images/De_lite.webp,
+de_thrill,Thrill,CS:GO,2017,false,none,,bomb_defusal|5v5,images/Map-thrill-overall.webp,
+cs_workout,Workout,CS:GO,2014,false,none,,hostage_rescue|5v5,images/Csgo-cs-workout.webp,
+de_ali,Ali,CS:GO,2013,false,none,,bomb_defusal|5v5,images/2186934885_preview_ali mid.png,
+cs_motel,Motel,CS:GO,2013,false,none,,hostage_rescue|5v5,images/Csgo_motel_big.webp,
+cs_museum,Museum,CS:GO,2013,false,none,,hostage_rescue|5v5,images/Csgo_museum_big.webp,
+de_favela,Favela,CS:GO,2013,false,none,,bomb_defusal|5v5,images/Csgo-de-favela.webp,
+de_library,Library,CS:GO,2013,false,none,,bomb_defusal|5v5,images/Csgo_library_big.webp,
+de_seaside,Seaside,CS:GO,2013,false,none,,bomb_defusal|5v5,images/De_seaside.webp,
+de_thunder,Thunder,CS:GO,2013,false,none,,bomb_defusal|5v5,images/Csgo-cs-thunder.webp,
+de_chinatown,Chinatown,CS:GO,2013,false,none,,bomb_defusal|5v5,images/Csgo_chinatown_big.webp,
+de_gwalior,Gwalior,CS:GO,2013,false,none,,bomb_defusal|5v5,images/Csgo_gwalior_big.webp,
+de_ruins,Ruins,CS:GO,2013,false,none,,bomb_defusal|5v5,images/Csgo_ruins_big.webp,
+de_siege,Siege,CS:GO,2013,false,none,,bomb_defusal|5v5,images/Csgo_siege_big.webp,
+cs_rush,Rush,CS:GO,2014,false,none,,hostage_rescue|5v5,images/Cs_rush.webp,
+de_blackgold,Black Gold,CS:GO,2014,false,none,,bomb_defusal|5v5,images/De_blackgold.webp,
+de_castle,Castle,CS:GO,2014,false,none,,bomb_defusal|5v5,images/De_castle.webp,
+de_mist,Mist,CS:GO,2014,false,none,,bomb_defusal|5v5,images/De_mist.webp,
+de_overgrown,Overgrown,CS:GO,2014,false,none,,bomb_defusal|5v5,images/De_overgrown.webp,
+cs_backalley,Back Alley,CS:GO,2014,false,none,,hostage_rescue|5v5,images/Csgo-cs-backalley.webp,
+de_bazaar,Bazaar,CS:GO,2014,false,none,,bomb_defusal|5v5,images/Csgo-de-bazaar.webp,
+de_facade,Facade,CS:GO,2014,false,none,,bomb_defusal|5v5,images/Csgo-de-facade.webp,
+de_marquis,Marquis,CS:GO,2014,false,none,,bomb_defusal|5v5,images/Csgo-de-marquis.webp,
+de_log,Log,CS:GO,2015,false,none,,bomb_defusal|5v5,images/Csgo-de_log-promo.webp,
+de_rails,Rails,CS:GO,2015,false,none,,bomb_defusal|5v5,images/Csgo_de_rails-promo.webp,
+de_resort,Resort,CS:GO,2015,false,none,,bomb_defusal|5v5,images/Csgo_de_resort-promo.webp,
+de_zoo,Zoo,CS:GO,2015,false,none,,bomb_defusal|5v5,images/De_zoo.webp,
+cs_cruise,Cruise,CS:GO,2016,false,none,,hostage_rescue|5v5,images/Csgo-cruise-workshop.webp,
+de_coast,Coast,CS:GO,2016,false,none,,bomb_defusal|5v5,images/De_coast.webp,
+de_empire,Empire,CS:GO,2016,false,none,,bomb_defusal|5v5,images/Csgo-empire-workshop.webp,
+de_mikla,Mikla,CS:GO,2016,false,none,,bomb_defusal|5v5,images/De_mikla.webp,
+de_royal,Royal,CS:GO,2016,false,none,,bomb_defusal|5v5,images/Csgo-royal-workshop.webp,
+de_tulip,Tulip,CS:GO,2016,false,none,,bomb_defusal|5v5,images/Csgo-tulip-workshop.webp,
 de_pitstop,Pitstop,CS:GO,2021,false,none,,wingman,,
 de_calavera,Calavera,CS:GO,2021,false,none,,wingman,,
 de_blagai,Blagai,CS:GO,2022,false,none,,wingman,,
 de_cascade,Cascade,CS:GO,2022,false,none,,wingman,,
-de_tuscan,Tuscan,CS:GO,2022,false,none,,bomb_defusal|5v5,,Official CS:GO addition
+de_tuscan,Tuscan,CS:GO,2022,false,none,,bomb_defusal|5v5,images/De_tuscan.webp,Official CS:GO addition
 de_elysion,Elysion,CS:GO,2020,false,none,,wingman,,
 de_guard,Guard,CS:GO,2020,false,none,,wingman,,
 de_ravine,Ravine,CS:GO,2021,false,none,,wingman,,
 de_extraction,Extraction,CS:GO,2021,false,none,,wingman,,
-cs_climb,Climb,CS:GO,2022,false,none,,hostage_rescue|5v5,,
+cs_climb,Climb,CS:GO,2022,false,none,,hostage_rescue|5v5,images/Cs_climb.webp,

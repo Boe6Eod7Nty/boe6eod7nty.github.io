@@ -135,12 +135,15 @@ def normalize_workshop_input(raw: str) -> tuple[str | None, str | None]:
 
 
 def has_cs2(map_obj: dict[str, Any]) -> bool:
+    """Return True if the map already has a CS2 or CS2* version tag.
+
+    Intentionally does NOT fall back to ``in_cs2``; version tagging is
+    driven solely by the ``versions`` list.
+    """
     versions = map_obj.get("versions")
-    if isinstance(versions, list) and any(str(v).strip() == "CS2" for v in versions):
-        return True
-    if map_obj.get("in_cs2") is True:
-        return True
-    return False
+    if not isinstance(versions, list):
+        return False
+    return any(str(v).strip() in ("CS2", "CS2*") for v in versions)
 
 
 def ensure_list_str(value: Any) -> list[str]:

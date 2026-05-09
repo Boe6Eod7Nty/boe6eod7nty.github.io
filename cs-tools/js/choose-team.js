@@ -20,6 +20,39 @@
     return `plyr-${seqNumber}`;
   }
 
+  const LANE_KEYS = ["location", "slot", "team", "lane", "assignment", "squad"];
+
+  function normalizePlayerChip(raw, idSeqForNew) {
+    if (!raw || typeof raw !== "object") return null;
+    const name = String(raw.name ?? raw.label ?? raw.nick ?? "").trim();
+    if (!name) return null;
+    let id = String(raw.id ?? "").trim();
+    if (!id) id = uniqId(typeof idSeqForNew === "number" ? idSeqForNew : Date.now());
+    let location = "";
+    for (const key of LANE_KEYS) {
+      const v = raw[key];
+      if (v === undefined || v === null || v === "") continue;
+      const slug = String(v)
+        .trim()
+        .toLowerCase()
+        .replace(/\s+|_/g, "");
+      if (slug === "team1" || slug === "t1" || slug === "0" || v === 0) {
+        location = "team1";
+        break;
+      }
+      if (slug === "team2" || slug === "t2" || slug === "1" || v === 1) {
+        location = "team2";
+        break;
+      }
+      if (slug === "pool" || slug === "bench" || slug === "unassigned" || slug === "freeagent") {
+        location = "pool";
+        break;
+      }
+    }
+    if (!location) location = "pool";
+    return { id, name, location };
+  }
+
   function loadState(modeBothHint) {
     try {
       const payload = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
@@ -28,7 +61,27 @@
       }
 
       const state = freshState(Boolean(modeBothHint) || payload.mode === "both");
-      state.players = Array.isArray(payload.players) ? [...payload.players] : [];
+      const rawList = Array.isArray(payload.players) ? payload.players : [];
+      let genSeq = rawList.reduce((max, chip) => {
+        const [, maybe] = String(chip?.id || "").split("-");
+        const parsed = Number(maybe);
+        return Number.isFinite(parsed) ? Math.max(max, parsed) : max;
+      }, typeof payload.nextSeq === "number" ? payload.nextSeq : 1000);
+      state.players = [];
+      rawList.forEach((chip) => {
+        const needNewId = !String(chip?.id ?? "").trim();
+        if (needNewId) genSeq += 1;
+        const normalized = normalizePlayerChip(chip, needNewId ? genSeq : undefined);
+        if (normalized) state.players.push(normalized);
+      });
+      state.nextSeq =
+        typeof payload.nextSeq === "number"
+          ? payload.nextSeq
+          : state.players.reduce((max, chip) => {
+              const [, maybe] = String(chip?.id || "").split("-");
+              const parsed = Number(maybe);
+              return Number.isFinite(parsed) ? Math.max(max, parsed) : max;
+            }, 1000);
       state.titles = {
         team1: typeof payload.titles?.team1 === "string" ? payload.titles.team1 : state.titles.team1,
         team2: typeof payload.titles?.team2 === "string" ? payload.titles.team2 : state.titles.team2,
@@ -43,18 +96,9 @@
       };
       state.locked = Boolean(payload.locked);
       state.mode = payload.mode === "both" ? "both" : null;
-      state.nextSeq =
-        typeof payload.nextSeq === "number"
-          ? payload.nextSeq
-          : state.players.reduce((max, chip) => {
-              const [, maybe] = String(chip?.id || "").split("-");
-              const parsed = Number(maybe);
-              return Number.isFinite(parsed) ? Math.max(max, parsed) : max;
-            }, 1000);
 
-      return state.players.every((chip) => chip && chip.id && chip.name && chip.location)
-        ? state
-        : freshState(Boolean(modeBothHint));
+      if (!state.players.length) return freshState(Boolean(modeBothHint));
+      return state;
     } catch (_) {
       return freshState(Boolean(modeBothHint));
     }
@@ -246,6 +290,12 @@
     return new URLSearchParams(window.location.search || "").get("mode") === "both";
   }
 
+  /** Opt out of automatic empty-unlocked reset when `mode=both` (e.g. preserve state after browser Back). */
+  function derivePreserveBothTeams() {
+    const p = new URLSearchParams(window.location.search || "");
+    return p.has("noReset");
+  }
+
   function resetBoard(combined) {
     localStorage.removeItem(STORAGE_KEY);
     stateRef = freshState(combined);
@@ -258,13 +308,24 @@
       stateRef.locked = true;
       persist(stateRef);
       render(stateRef);
+      /*
+       * Combined lock-in = new matchup: drop stale veto / recap so choose-map cannot hydrate
+       * a finished veto (localStorage cs-tools-veto survives home → Both → lock).
+       * Verify: finish veto → home → Choose Both → lock → choose-map opens on picker (GO), not veto UI.
+       */
+      localStorage.removeItem("cs-tools-veto");
+      try {
+        sessionStorage.removeItem("cs-tools-match-summary");
+      } catch (_) {}
       const teamOne = encodeURIComponent(
         stateRef.titles.team1.trim() || playersFor(stateRef, "team1")[0]?.name || "Team 1",
       );
       const teamTwo = encodeURIComponent(
         stateRef.titles.team2.trim() || playersFor(stateRef, "team2")[0]?.name || "Team 2",
       );
-      window.location.assign(`choose-map.html?mode=both&team1=${teamOne}&team2=${teamTwo}`);
+      window.location.assign(
+        `choose-map.html?mode=both&resetVeto=1&team1=${teamOne}&team2=${teamTwo}`,
+      );
       return;
     }
     stateRef.locked = !stateRef.locked;
@@ -275,8 +336,14 @@
   function init() {
     CSToolsNav?.init(".site-menu");
     const combined = deriveModeBoth();
-    stateRef = loadState(combined);
-    persist(stateRef);
+    const preserveBothTeams = derivePreserveBothTeams();
+    if (combined && !preserveBothTeams) {
+      stateRef = freshState(true);
+      persist(stateRef);
+    } else {
+      stateRef = loadState(combined);
+      persist(stateRef);
+    }
 
     const refs = snapshotDom();
 

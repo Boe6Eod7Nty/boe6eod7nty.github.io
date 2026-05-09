@@ -266,6 +266,11 @@ textarea {
   gap: 18px;
 }
 
+/* Space below sticky filter strips (browse + picker only; veto has no adjacent .filter-bar). */
+.filter-bar + .map-grid {
+  margin-top: clamp(10px, 1.25vw, 14px);
+}
+
 .map-card {
   position: relative;
   display: block;
@@ -309,20 +314,64 @@ textarea {
   filter: brightness(1);
 }
 
-.map-card.has-thumb-img .map-card-thumb.is-visible {
+/* Thumb dimming: only in map pool picker (#picker-grid). Browse / veto use full brightness. */
+#picker-grid .map-card.has-thumb-img .map-card-thumb.is-visible {
   filter: brightness(0.35);
   transition: filter 160ms ease;
 }
 
-.map-card.has-thumb-img:hover .map-card-thumb.is-visible:not(.freeze-brightness) {
+#picker-grid .map-card.has-thumb-img:hover .map-card-thumb.is-visible:not(.freeze-brightness) {
   filter: brightness(0.6);
 }
 
-.map-card.has-thumb-img.is-selected .map-card-thumb.is-visible:not(.freeze-brightness) {
+#picker-grid .map-card.has-thumb-img.is-selected .map-card-thumb.is-visible:not(.freeze-brightness) {
   filter: brightness(1);
 }
 
-.map-card-title {
+/* Veto deck: no thumbnail brightening on hover; actionable maps show cue glyph only (no full-card tint). */
+#veto-grid .map-card:hover::before {
+  filter: brightness(0.35);
+}
+
+#veto-grid .map-card.has-thumb-img:hover .map-card-thumb.is-visible {
+  filter: brightness(1);
+  transition: none;
+}
+
+#veto-grid .map-card[data-veto-cue]:hover.has-thumb-img .map-card-thumb.is-visible {
+  filter: brightness(0.92);
+  transition: filter 140ms ease;
+}
+
+#veto-grid .map-card[data-veto-cue] {
+  cursor: pointer;
+}
+
+#veto-grid .veto-applied-tint {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+#veto-grid .veto-applied-tint--ban {
+  background: rgba(192, 57, 43, 0.45);
+}
+
+#veto-grid .veto-applied-tint--pick {
+  background: rgba(76, 175, 118, 0.4);
+}
+
+#veto-grid .map-card-static.is-banned {
+  filter: none;
+}
+
+#veto-grid .map-card[data-veto-cue]:hover .veto-indicator {
+  opacity: 1;
+}
+
+/* Overlay titles on thumbnails live inside `.map-card` only; captions on match summary / results are siblings of the card — they must stay in normal flow. */
+.map-card .map-card-title {
   position: absolute;
   right: 14px;
   bottom: 14px;
@@ -371,10 +420,23 @@ textarea {
   position: sticky;
   top: 0;
   z-index: 10;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
   gap: 12px;
   padding: 14px;
+}
+
+.filter-bar > .filter-stack:not(.filter-stack--search) {
+  flex: 1 1 160px;
+  min-width: 0;
+}
+
+.filter-bar > .filter-stack--search {
+  flex: 1 1 220px;
+  min-width: min(220px, 100%);
+  max-width: 100%;
+  margin-inline-start: auto;
 }
 
 .page-header {
@@ -591,19 +653,6 @@ textarea {
   opacity: 0.65;
 }
 
-.veto-indicator .ban {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: clamp(4rem, 11vw, 6rem);
-  line-height: 1;
-  text-transform: lowercase;
-}
-
-.veto-indicator .pick {
-  color: rgba(76, 175, 118, 0.85);
-  font-size: clamp(4rem, 11vw, 6rem);
-  line-height: 1;
-}
-
 .map-card-overlay {
   position: absolute;
   inset: 0;
@@ -612,13 +661,15 @@ textarea {
   place-items: center;
 }
 
-.map-card-overlay .ban-done {
+.map-card-overlay .ban-done,
+#veto-grid .veto-indicator .ban-done {
   color: var(--accent-red);
   font-size: clamp(4rem, 11vw, 6rem);
   text-shadow: 0 14px 30px rgba(0, 0, 0, 0.6);
 }
 
-.map-card-overlay .pick-done {
+.map-card-overlay .pick-done,
+#veto-grid .veto-indicator .pick-done {
   color: var(--accent-green);
   font-size: clamp(4rem, 11vw, 6rem);
   text-shadow: 0 14px 30px rgba(0, 0, 0, 0.6);
@@ -891,28 +942,116 @@ textarea {
   display: grid;
   grid-template-columns: minmax(180px, 220px) 1fr;
   gap: 12px;
-  min-height: 420px;
+  min-height: min(420px, 70vh);
   margin-top: 16px;
+  align-items: stretch;
 }
 
-.history-panel {
-  display: grid;
-  align-content: start;
+/* Veto timeline only (#panel-veto): list grows, actions stay bottom-aligned */
+#panel-veto .history-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
   gap: 10px;
   padding: 12px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(22, 24, 32, 0.88);
-  min-height: 0;
+  min-height: clamp(168px, 22vh, 320px);
+  align-self: stretch;
 }
 
-.history-list {
-  display: grid;
+#panel-veto .history-list {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
   gap: 8px;
-  max-height: 52vh;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow: auto;
   color: var(--text-secondary);
   font-size: 1rem;
   line-height: 1.2;
+}
+
+#panel-veto .history-list > * {
+  flex-shrink: 0;
+}
+
+#panel-veto .history-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+  flex-shrink: 0;
+}
+
+/* Starting-side prompt after each map pick (choose-map veto) */
+#panel-veto .veto-side-pick-dock {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border: 1px solid rgba(230, 201, 122, 0.32);
+  background: linear-gradient(135deg, rgba(230, 201, 122, 0.09), rgba(22, 24, 32, 0.95));
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+}
+
+#panel-veto .veto-side-pick-dock__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+#panel-veto .veto-side-pick-dock__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: min(100%, 280px);
+}
+
+#panel-veto .veto-side-pick-dock__eyebrow {
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-gold);
+}
+
+#panel-veto .veto-side-pick-dock__map {
+  font-size: 1.25rem;
+  line-height: 1.15;
+}
+
+#panel-veto .veto-side-pick-dock__who {
+  font-size: 0.98rem;
+  color: var(--text-secondary);
+}
+
+#panel-veto .veto-side-pick-dock__team {
+  color: var(--text-primary);
+}
+
+#panel-veto .veto-side-pick-dock__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+#panel-veto .veto-side-btn {
+  min-width: 72px;
+  min-height: 52px;
+  justify-content: center;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+#panel-veto .veto-side-btn--t {
+  border-color: rgba(192, 57, 43, 0.55);
+}
+
+#panel-veto .veto-side-btn--ct {
+  border-color: rgba(60, 130, 246, 0.55);
 }
 
 .turn-banner {
@@ -933,7 +1072,8 @@ textarea {
 }
 
 .config-panel {
-  display: grid;
+  display: flex;
+  align-items: stretch;
   gap: 12px;
   padding: 16px;
   margin-bottom: 16px;
@@ -941,11 +1081,17 @@ textarea {
   background: rgba(22, 24, 32, 0.88);
 }
 
-.config-grid {
+.config-grid,
+.config-main-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 12px;
   align-items: end;
+}
+
+.config-main-grid {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .config-inline {
@@ -968,7 +1114,104 @@ textarea {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.config-cs2-option {
+  display: inline-flex;
   align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  margin: 0;
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-transform: none;
+}
+
+/* Choose Map — separate GO panel on #panel-selection only (browse maps / other pages unchanged) */
+#panel-selection .config-go-panel {
+  display: flex;
+  flex: 0 0 clamp(172px, 18vw, 232px);
+  flex-direction: column;
+  align-items: center;
+  align-self: stretch;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(10, 11, 13, 0.45);
+}
+
+#panel-selection .config-main-grid > .button.is-muted {
+  justify-content: center;
+  min-height: 44px;
+  align-self: end;
+}
+
+#panel-selection #go-veto-btn {
+  box-sizing: border-box;
+  justify-content: center;
+  padding-inline: 44px;
+  width: 100%;
+  font-size: 3rem;
+  line-height: 1;
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 760px) {
+  #panel-selection .config-panel {
+    flex-direction: column;
+  }
+
+  #panel-selection .config-go-panel {
+    flex-basis: auto;
+    width: 100%;
+  }
+}
+
+@media (max-width: 520px) {
+  #panel-selection #go-veto-btn {
+    font-size: clamp(1.85rem, 9vw, 3rem);
+    padding-inline: clamp(18px, 5vw, 44px);
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+.picker-count-banner {
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.best-of-box {
+  width: fit-content;
+  max-width: 100%;
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 6px;
+  background: rgba(10, 11, 13, 0.45);
+  display: inline-flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.filter-stack--checkbox label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  text-transform: none;
+}
+
+.filter-stack--checkbox input[type="checkbox"] {
+  width: 1.05rem;
+  height: 1.05rem;
+  accent-color: var(--accent-green, #4caf7a);
 }
 
 .summary-grid {
@@ -993,8 +1236,38 @@ textarea {
 }
 
 .summary-large-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
   width: min(220px, 44vw);
   text-align: center;
+}
+
+/* Captions beneath thumbnails (figcaption), not overlapping the thumbnail */
+.summary-large-card > figcaption.map-card-title {
+  margin-top: 8px;
+  font-size: clamp(0.85rem, 2.8vw, 1.05rem);
+  line-height: 1.2;
+}
+
+.summary-large-card > figcaption.map-card-title .map-caption-primary {
+  display: block;
+}
+
+.map-caption-dual-side {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15em;
+  margin-top: 6px;
+  font-size: max(0.78rem, 0.92em);
+  line-height: 1.38;
+  color: rgba(255, 255, 255, 0.86);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.summary-large-card > figcaption.map-card-title .map-caption-dual-side-line {
+  display: block;
 }
 
 .placeholder-fill {
@@ -1065,8 +1338,9 @@ textarea {
     grid-template-columns: 1fr;
   }
 
-  .history-panel {
+  #panel-veto .history-panel {
     order: 2;
+    min-height: clamp(140px, 28vh, 360px);
   }
 }
 

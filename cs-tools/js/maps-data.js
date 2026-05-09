@@ -45,6 +45,23 @@
     return map.tags && map.tags.includes("active_duty");
   }
 
+  /** Matches version badges: official CS2 or workshop CS2* port; also honors in_cs2 for active pool maps. */
+  function isCs2CompatibleMap(map) {
+    const versions = Array.isArray(map?.versions) ? map.versions : [];
+    if (versions.includes("CS2") || versions.includes("CS2*")) return true;
+    if (map && map.in_cs2 === true) return true;
+    return false;
+  }
+
+  function parseCs2OnlyFlag(filters) {
+    if (!Object.prototype.hasOwnProperty.call(filters, "cs2Only")) return false;
+    const raw = filters.cs2Only;
+    if (raw == null || raw === "") return false;
+    const v = String(raw).trim().toLowerCase();
+    if (v === "0" || v === "false" || v === "off" || v === "no") return false;
+    return true;
+  }
+
   function sortMapsChooser(maps, sortWithin = "newest") {
     const duty = maps.filter(isActiveDuty);
     const rest = maps.filter((m) => !isActiveDuty(m));
@@ -150,9 +167,14 @@
     const yearList = toList(filters.year);
     const operationList = toList(filters.operation);
     const poolList = toList(filters.poolStatus);
+    const cs2Only = parseCs2OnlyFlag(filters);
 
     const filtered = maps.filter((map) => {
       if (search && !normalizeText(map.name).includes(search)) {
+        return false;
+      }
+
+      if (cs2Only && !isCs2CompatibleMap(map)) {
         return false;
       }
 

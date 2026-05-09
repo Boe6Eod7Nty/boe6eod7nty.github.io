@@ -29,10 +29,6 @@
 
       <form class="filter-bar" id="filter-form">
         <div class="filter-stack">
-          <label for="search-input">Search</label>
-          <input class="field" id="search-input" name="search" type="search" placeholder="Mirage..." autocomplete="off">
-        </div>
-        <div class="filter-stack">
           <label for="filter-version">Game version</label>
           <div class="multiselect" data-multiselect="version" data-label="Game version">
             <button type="button" class="field multiselect-toggle" id="filter-version" aria-haspopup="true" aria-expanded="false"></button>
@@ -81,6 +77,10 @@
             <option value="za">Z → A</option>
           </select>
         </div>
+        <div class="filter-stack filter-stack--search">
+          <label for="search-input">Search</label>
+          <input class="field" id="search-input" name="search" type="search" placeholder="Mirage..." autocomplete="off">
+        </div>
       </form>
 
       <div class="map-grid" id="map-results" aria-live="polite"></div>
@@ -92,6 +92,7 @@
     <script src="js/map-cards.js"></script>
     <script src="js/map-modal.js"></script>
     <script src="js/nav-menu.js"></script>
+    <script src="js/multiselect.js"></script>
     <script src="js/browse-maps.js"></script>
   </body>
 </html>

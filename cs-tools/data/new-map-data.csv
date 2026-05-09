@@ -9,7 +9,7 @@ de_ancient,Ancient,CS:GO|CS2,2020,true,official,,bomb_defusal|active_duty|5v5,,O
 de_anubis,Anubis,CS:GO|CS2,2020,true,official,,bomb_defusal|active_duty|5v5,,Community map purchased by Valve
 de_train,Train,CS|CSS|CS:GO|CS2,1999,true,official,,bomb_defusal|5v5,,Originally released in CS Beta 5.0
 de_cache,Cache,CSS|CS:GO|CS2,2010,true,community,,bomb_defusal|5v5,,Originally a custom map for CSS
-de_cobblestone,Cobblestone,CS|CSS|CS:GO,2000,false,none,,bomb_defusal|5v5,,Originally released in CS Beta 6.5
+de_cbble,Cobblestone,CS|CSS|CS:GO|CS2*,2000,false,none,https://steamcommunity.com/sharedfiles/filedetails/?id=3070293560,bomb_defusal|5v5,,Originally released in CS Beta 6.5; merged from de_cobblestone
 de_aztec,Aztec,CS|CSS|CS:GO,2000,false,none,,bomb_defusal|5v5,,Originally released in CS Beta 6.5
 de_dust,Dust,CS|CSS|CS:GO,1999,false,none,,bomb_defusal|5v5,,Originally released in CS Beta 4.0
 cs_office,Office,CS|CSS|CS:GO|CS2,2000,true,official,,hostage_rescue|5v5,,Originally released in CS Beta 7.0

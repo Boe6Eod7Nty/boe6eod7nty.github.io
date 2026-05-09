@@ -43,8 +43,8 @@
       if (s) set.add(s);
     });
 
-    // Defensive: some data may mark in_cs2 without listing "CS2" in versions.
-    if (map?.in_cs2) set.add("CS2");
+    // If "CS2*" is present, suppress the plain "CS2" badge to avoid duplicates.
+    if (set.has("CS2*")) set.delete("CS2");
 
     const ordered = CANONICAL_VERSION_ORDER.filter((v) => set.has(v));
     // Include any non-canonical strings at end (but stable).

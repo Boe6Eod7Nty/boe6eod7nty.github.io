@@ -31,7 +31,7 @@
 
       <section id="panel-selection">
         <form class="config-panel" id="config-form">
-          <div class="config-grid">
+          <div class="config-main-grid">
             <div class="filter-stack">
               <label for="team-one-name">Team 1 Name</label>
               <input class="field" id="team-one-name" name="team1Name" maxlength="72" autocomplete="off">
@@ -54,18 +54,24 @@
               <label for="pool-size-select">Map pool count</label>
               <select class="field" id="pool-size-select" name="poolSize"></select>
             </div>
+            <fieldset class="best-of-box config-inline filter-stack">
+              <legend class="detail-label">Best-of</legend>
+              <div class="radio-row">
+                <label><input type="radio" name="bestOf" value="1"> Bo1</label>
+                <label><input type="radio" name="bestOf" value="3" checked> Bo3</label>
+                <label><input type="radio" name="bestOf" value="5"> Bo5</label>
+              </div>
+            </fieldset>
+            <label class="config-cs2-option filter-stack--checkbox" for="pick-cs2-only">
+              <input type="checkbox" id="pick-cs2-only" name="cs2Only" value="1" checked>
+              Show only CS2 compatible maps
+            </label>
+            <button class="button is-muted" id="random-pool-btn" type="button" title="Replace staged maps with random picks from the current filtered list">Random pool</button>
+            <button class="button is-muted" id="deselect-all-btn" type="button" title="Clear all staged maps from the picker">Deselect all</button>
           </div>
-          <fieldset class="config-inline filter-stack">
-            <legend class="detail-label">Best-of</legend>
-            <div class="radio-row">
-              <label><input type="radio" name="bestOf" value="1"> Bo1</label>
-              <label><input type="radio" name="bestOf" value="3" checked> Bo3</label>
-              <label><input type="radio" name="bestOf" value="5"> Bo5</label>
-            </div>
-          </fieldset>
-          <div class="config-actions">
+          <div class="config-go-panel">
             <button class="button is-primary" id="go-veto-btn" type="button" disabled>GO</button>
-            <strong id="picker-count-banner" aria-live="polite">0 / 0 maps selected</strong>
+            <strong id="picker-count-banner" class="picker-count-banner" aria-live="polite">0 / 0 maps selected</strong>
           </div>
         </form>
 
@@ -83,14 +89,17 @@
           <aside class="history-panel">
             <div class="detail-label">Timeline</div>
             <div class="history-list" id="history-list"></div>
-            <button type="button" class="button is-muted" id="undo-action">Undo</button>
-            <button type="button" class="button is-muted" id="redo-action">Redo</button>
-            <button type="button" class="button is-muted" id="reset-veto">Reset veto</button>
+            <div class="history-actions">
+              <button type="button" class="button is-muted" id="undo-action">Undo</button>
+              <button type="button" class="button is-muted" id="redo-action">Redo</button>
+              <button type="button" class="button is-muted" id="reset-veto">Reset veto</button>
+            </div>
           </aside>
           <section>
             <div class="map-grid" id="veto-grid" aria-live="polite"></div>
           </section>
         </div>
+        <div id="side-pick-dock" class="veto-side-pick-dock" hidden aria-live="polite"></div>
       </section>
     </main>
 
@@ -99,6 +108,7 @@
     <script src="js/map-cards.js"></script>
     <script src="js/map-modal.js"></script>
     <script src="js/nav-menu.js"></script>
+    <script src="js/multiselect.js"></script>
     <script src="js/choose-map.js"></script>
   </body>
 </html>

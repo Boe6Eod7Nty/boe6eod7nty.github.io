@@ -33,14 +33,7 @@
 
   }
 
-  function sideWord(code) {
-
-    if (code === "T") return "Terrorist";
-    if (code === "CT") return "Counter-Terrorist";
-    return "Side unset";
-
-  }
-
+  /** Mirrors `classifyTeamLane` in choose-map.js so persisted chips classify the same everywhere. */
   function classifyTeamLaneChip(chip) {
     const raw = chip?.location ?? chip?.slot ?? chip?.team ?? chip?.lane ?? chip?.assignment ?? chip?.squad;
     if (raw === 0 || raw === "0") return "team1";
@@ -51,6 +44,7 @@
       .replace(/\s+|_/g, "");
     if (slug === "team1" || slug === "t1" || slug === "a" || slug === "attackers") return "team1";
     if (slug === "team2" || slug === "t2" || slug === "b" || slug === "defenders") return "team2";
+    if (slug === "pool" || slug === "bench" || slug === "unassigned" || slug === "freeagent") return "pool";
     return "";
   }
 
@@ -146,22 +140,22 @@
     else if (tableEmpty && !payloadDerivedNonEmpty && diskDerivedNonEmpty)
       teamRosters = derivedFromDiskTeams;
 
-    const sides = {
-      team1:
-        payload.sides?.team1 === "T" || payload.sides?.team1 === "CT"
-          ? payload.sides.team1
-          : diskTeams.sides?.team1 ?? null,
-      team2:
-        payload.sides?.team2 === "T" || payload.sides?.team2 === "CT"
-          ? payload.sides.team2
-          : diskTeams.sides?.team2 ?? null,
+    // Payload can carry stale or mis-classified `teamRosters` / roster chips (still "team" buckets in LS).
+    // Finalize per lane: prefer non-empty serialized lists; otherwise fall back to current `cs-tools-teams`.
+    const laneFinalize = (lane) => {
+      const fromTbl = coerceRosterDisplayNames(teamRosters[lane]);
+      if (fromTbl.length) return fromTbl;
+      const fromDisk = coerceRosterDisplayNames(derivedFromDiskTeams[lane]);
+      if (fromDisk.length) return fromDisk;
+      return [];
     };
+
+    teamRosters = { team1: laneFinalize("team1"), team2: laneFinalize("team2") };
 
     return {
       ...payload,
       roster: rosterPlayers,
       teamRosters,
-      sides,
     };
   }
 
@@ -327,11 +321,6 @@
 
     document.getElementById("team-one-banner").textContent = payload.team1Name || "Team 1";
     document.getElementById("team-two-banner").textContent = payload.team2Name || "Team 2";
-
-    const metaOneNode = document.getElementById("team-one-meta");
-    const metaTwoNode = document.getElementById("team-two-meta");
-    metaOneNode.textContent = sideWord(payload.sides?.team1);
-    metaTwoNode.textContent = sideWord(payload.sides?.team2);
 
     function fillList(domNode, rosterRow) {
 

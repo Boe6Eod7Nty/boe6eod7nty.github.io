@@ -84,6 +84,8 @@
           localStorage.removeItem("cs-tools-teams");
           try {
             sessionStorage.removeItem("cs-tools-match-summary");
+            sessionStorage.removeItem("cs-tools-roster-at-lock");
+            sessionStorage.removeItem("cs-tools-sides-at-lock");
           } catch (_) {}
         },
         true,

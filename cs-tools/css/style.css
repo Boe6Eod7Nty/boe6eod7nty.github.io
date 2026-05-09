@@ -90,12 +90,6 @@ textarea {
   min-height: 96px;
 }
 
-.page-shell.is-fullheight .side-toggle {
-  width: 54px;
-  height: 54px;
-  font-size: 1.3rem;
-}
-
 .page-shell.is-fullheight .team-title-edit {
   padding: 6px 8px;
 }
@@ -831,30 +825,6 @@ textarea {
   border: 1px solid rgba(255, 255, 255, 0.14);
   color: var(--text-primary);
   background: rgba(10, 11, 13, 0.72);
-}
-
-.side-toggle {
-  width: 62px;
-  height: 62px;
-  border-radius: 999px;
-  border: 2px solid rgba(255, 255, 255, 0.22);
-  color: var(--text-primary);
-  background: rgba(10, 11, 13, 0.75);
-  font-size: 1.4rem;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.side-toggle.is-t {
-  border-color: rgba(192, 57, 43, 0.55);
-}
-
-.side-toggle.is-ct {
-  border-color: rgba(52, 120, 200, 0.55);
-}
-
-.side-toggle.is-unknown {
-  color: var(--text-secondary);
 }
 
 .team-drop-zone {

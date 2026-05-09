@@ -4,6 +4,9 @@
   const CFG_KEY = "cs-tools-map-config";
   const VETO_KEY = "cs-tools-veto";
   const SUMMARY_KEY = "cs-tools-match-summary";
+  /** Set on combined lock-in (choose-team); survives when localStorage is empty so recap payloads still list players. */
+  const ROSTER_LOCK_KEY = "cs-tools-roster-at-lock";
+  const SIDES_LOCK_KEY = "cs-tools-sides-at-lock";
 
   let atlas = [];
   let staged = new Set();
@@ -90,25 +93,31 @@
     const disk = read(CFG_KEY, {});
     const qs = new URLSearchParams(location.search || "");
     const blended = qs.get("mode") === "both";
-    let t1 = typeof disk.team1Name === "string" ? disk.team1Name : "Team 1";
-    let t2 = typeof disk.team2Name === "string" ? disk.team2Name : "Team 2";
-    const fromTitles = blended ? teamTitlesFromTeamsBlob() : { team1: "", team2: "" };
-    if (blended && qs.has("team1")) {
-      const q = qpDecoded("team1");
-      if (q) t1 = q;
-      else if (fromTitles.team1) t1 = fromTitles.team1;
+    const combinedFlow = blended || Boolean(disk.bothFlow);
+
+    let t1 = "Team 1";
+    let t2 = "Team 2";
+    if (combinedFlow) {
+      t1 = typeof disk.team1Name === "string" ? disk.team1Name : "Team 1";
+      t2 = typeof disk.team2Name === "string" ? disk.team2Name : "Team 2";
+      const fromTitles = blended ? teamTitlesFromTeamsBlob() : { team1: "", team2: "" };
+      if (blended && qs.has("team1")) {
+        const q = qpDecoded("team1");
+        if (q) t1 = q;
+        else if (fromTitles.team1) t1 = fromTitles.team1;
+      }
+      if (blended && qs.has("team2")) {
+        const q = qpDecoded("team2");
+        if (q) t2 = q;
+        else if (fromTitles.team2) t2 = fromTitles.team2;
+      }
+      const looksDefaultName = (s, fb) => {
+        const x = String(s ?? "").trim().toLowerCase();
+        return !x || x === fb || x.replace(/\s+/g, "") === "team1" || x.replace(/\s+/g, "") === "team2";
+      };
+      if (blended && !qs.has("team1") && fromTitles.team1 && looksDefaultName(t1, "team 1")) t1 = fromTitles.team1;
+      if (blended && !qs.has("team2") && fromTitles.team2 && looksDefaultName(t2, "team 2")) t2 = fromTitles.team2;
     }
-    if (blended && qs.has("team2")) {
-      const q = qpDecoded("team2");
-      if (q) t2 = q;
-      else if (fromTitles.team2) t2 = fromTitles.team2;
-    }
-    const looksDefaultName = (s, fb) => {
-      const x = String(s ?? "").trim().toLowerCase();
-      return !x || x === fb || x.replace(/\s+/g, "") === "team1" || x.replace(/\s+/g, "") === "team2";
-    };
-    if (blended && !qs.has("team1") && fromTitles.team1 && looksDefaultName(t1, "team 1")) t1 = fromTitles.team1;
-    if (blended && !qs.has("team2") && fromTitles.team2 && looksDefaultName(t2, "team 2")) t2 = fromTitles.team2;
     const pool = Number.isFinite(Number(disk.poolSize)) ? Number(disk.poolSize) : 7;
 
     let bestVal = Number(disk.bestOf);
@@ -122,7 +131,7 @@
       bestOf: bestVal,
       filters: disk.filters && typeof disk.filters === "object" ? disk.filters : {},
       selections: Array.isArray(disk.selectedIds) ? disk.selectedIds.slice() : [],
-      bothFlow: blended || Boolean(disk.bothFlow),
+      bothFlow: combinedFlow,
     };
   }
 
@@ -385,9 +394,12 @@
 
   function persistDraft() {
 
+    const cfgSnap = readCfg();
+    const combinedTeams = cfgSnap.bothFlow || bothHints();
+
     persistCfg({
-      team1Name: ui.t1.value,
-      team2Name: ui.t2.value,
+      team1Name: combinedTeams ? ui.t1.value : "Team 1",
+      team2Name: combinedTeams ? ui.t2.value : "Team 2",
 
       vetoFormat: ui.fmt.value,
 
@@ -399,7 +411,7 @@
 
       filters: ui.filters ? filterPacket(ui.filters) : {},
 
-      bothFlow: readCfg().bothFlow || bothHints(),
+      bothFlow: combinedTeams,
     });
 
   }
@@ -440,18 +452,32 @@
     if (fmt === "veto3_random") return [...bans(Math.max(poolLen - 3, 0), banSeed), { type: "lottery_three" }];
     if (bo === 1) return bans(Math.max(poolLen - 1, 0), banSeed);
 
-    // Bo3: (poolLen − 3) bans and 2 picks before decider — interleave as
-    // Ban, Ban, Pick, Pick, then any remaining bans (7 maps → B,B,P,P,B,B, decider).
+    // Bo3: (poolLen - 3) bans and 2 picks before decider. Keep the final
+    // two bans after picks when possible (11 maps -> 6 bans, 2 picks, 2 bans, decider).
     // banSeed / pickSeed come from rotations(fmt) — ESL default 0,0; HLTV 1,1; FACEIT 0,1.
     if (bo === 3) {
       const banLen = Math.max(poolLen - 3, 0);
-      const firstBanCount = Math.min(2, banLen);
-      const lastBanCount = Math.max(banLen - 2, 0);
+      const lastBanCount = Math.min(2, banLen);
+      const firstBanCount = banLen - lastBanCount;
       return [
         ...bans(firstBanCount, banSeed),
         ...picks(2, pickSeed),
         ...bans(lastBanCount, (banSeed + firstBanCount) % 2),
         { type: "decider" },
+      ];
+    }
+
+    // Bo5: poolLen − 5 bans (no decider) and 5 pick steps — interleave like Bo3.
+    // Prefer up to two trailing bans (same cap as Bo3; pool 13+ keeps more bans up front).
+    // e.g. pool 9: banLen=4 → bans×2 → picks×5 → bans×2; pool 6: banLen=1 → picks×5 → ban×1.
+    if (bo === 5) {
+      const banLen = Math.max(poolLen - 5, 0);
+      const lastBanCount = Math.min(2, banLen);
+      const firstBanCount = banLen - lastBanCount;
+      return [
+        ...bans(firstBanCount, banSeed),
+        ...picks(5, pickSeed),
+        ...bans(lastBanCount, (banSeed + firstBanCount) % 2),
       ];
     }
 
@@ -464,11 +490,12 @@
   }
 
   function label(teamIdx) {
+    const combinedTeams = bothHints() || readCfg().bothFlow;
+    if (!combinedTeams) return `Team ${teamIdx + 1}`;
 
     const roster = meta.labels || [];
 
     return roster[teamIdx] || `Team ${teamIdx + 1}`;
-
   }
 
   function title(id) {
@@ -886,6 +913,30 @@
     });
   }
 
+  function readRosterLockSession() {
+    try {
+      const raw = sessionStorage.getItem(ROSTER_LOCK_KEY);
+      const parsed = raw ? JSON.parse(raw) : null;
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function readSidesLockSession() {
+    try {
+      const raw = sessionStorage.getItem(SIDES_LOCK_KEY);
+      const parsed = raw ? JSON.parse(raw) : null;
+      if (!parsed || typeof parsed !== "object") return null;
+      return {
+        team1: parsed.team1 === "T" || parsed.team1 === "CT" ? parsed.team1 : null,
+        team2: parsed.team2 === "T" || parsed.team2 === "CT" ? parsed.team2 : null,
+      };
+    } catch (_) {
+      return null;
+    }
+  }
+
   function parseCsToolsTeamsPersisted() {
     try {
       const raw = localStorage.getItem("cs-tools-teams");
@@ -1026,22 +1077,41 @@
 
   function summarizePayload(built, journal, snapshot) {
     const teams = parseCsToolsTeamsPersisted();
-    const rosterPlayers = teams.players.slice();
-    const teamRosters = teamRostersFromPlayers(rosterPlayers);
-    const persistedCfg = read(CFG_KEY, {});
-    const fromBlob = teamTitlesFromTeamsBlob();
-    const fallback1 =
-      ui.t1.value.trim() ||
-      (typeof persistedCfg.team1Name === "string" && persistedCfg.team1Name.trim()) ||
-      fromBlob.team1 ||
-      "Team 1";
-    const fallback2 =
-      ui.t2.value.trim() ||
-      (typeof persistedCfg.team2Name === "string" && persistedCfg.team2Name.trim()) ||
-      fromBlob.team2 ||
-      "Team 2";
+    const combinedFlowHints = Boolean(readCfg().bothFlow || bothHints());
+    let rosterPlayers = Array.isArray(teams.players) ? teams.players.slice() : [];
+    if (!rosterPlayers.length && combinedFlowHints) rosterPlayers = readRosterLockSession().slice();
 
-    const labelPair = [fallback1.slice(0, 72), fallback2.slice(0, 72)];
+    const teamRosters = teamRostersFromPlayers(rosterPlayers);
+
+    const pickSideCode = (v) => (v === "T" || v === "CT" ? v : null);
+    let mergedSides =
+      teams.sides && typeof teams.sides === "object"
+        ? {
+            team1: pickSideCode(teams.sides.team1),
+            team2: pickSideCode(teams.sides.team2),
+          }
+        : { team1: null, team2: null };
+    if (!(mergedSides.team1 || mergedSides.team2) && combinedFlowHints) {
+      const lk = readSidesLockSession();
+      if (lk) mergedSides = lk;
+    }
+    const persistedCfg = read(CFG_KEY, {});
+    let labelPair = ["Team 1", "Team 2"];
+
+    if (combinedFlowHints) {
+      const fromBlob = teamTitlesFromTeamsBlob();
+      const fallback1 =
+        ui.t1.value.trim() ||
+        (typeof persistedCfg.team1Name === "string" && persistedCfg.team1Name.trim()) ||
+        fromBlob.team1 ||
+        "Team 1";
+      const fallback2 =
+        ui.t2.value.trim() ||
+        (typeof persistedCfg.team2Name === "string" && persistedCfg.team2Name.trim()) ||
+        fromBlob.team2 ||
+        "Team 2";
+      labelPair = [fallback1.slice(0, 72), fallback2.slice(0, 72)];
+    }
 
     return {
 
@@ -1052,7 +1122,7 @@
 
       history: journal,
 
-      sides: teams.sides,
+      sides: mergedSides,
 
       roster: rosterPlayers,
       teamRosters,
@@ -1064,8 +1134,13 @@
 
   function openResults(snapshot) {
     const payload = summarizePayload(snapshot.picks, snapshot.logs.slice(), snapshot);
-    if (payload.bothMode) sessionStorage.setItem(SUMMARY_KEY, JSON.stringify(payload));
-    else sessionStorage.removeItem(SUMMARY_KEY);
+    if (payload.bothMode) {
+      sessionStorage.setItem(SUMMARY_KEY, JSON.stringify(payload));
+      try {
+        sessionStorage.removeItem(ROSTER_LOCK_KEY);
+        sessionStorage.removeItem(SIDES_LOCK_KEY);
+      } catch (_) {}
+    } else sessionStorage.removeItem(SUMMARY_KEY);
 
     const overlay = document.createElement("div");
     overlay.className = "result-overlay";
@@ -1241,9 +1316,14 @@
   }
 
   function hydratePicker(cfg) {
-
-    ui.t1.value = cfg.team1Name;
-    ui.t2.value = cfg.team2Name;
+    const combinedTeams = cfg.bothFlow || bothHints();
+    if (!combinedTeams) {
+      ui.t1.value = "Team 1";
+      ui.t2.value = "Team 2";
+    } else {
+      ui.t1.value = cfg.team1Name;
+      ui.t2.value = cfg.team2Name;
+    }
     ui.fmt.value = cfg.vetoFormat;
     ui.poolSel.value = String(cfg.poolSize);
     ui.bestBtns.forEach((btnPiece) => (btnPiece.checked = btnPiece.value === String(cfg.bestOf)));

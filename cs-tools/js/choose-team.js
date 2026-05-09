@@ -90,10 +90,7 @@
           team2: Boolean(payload.titles?.touches?.team2),
         },
       };
-      state.sides = {
-        team1: payload.sides?.team1 === "T" || payload.sides?.team1 === "CT" ? payload.sides.team1 : null,
-        team2: payload.sides?.team2 === "T" || payload.sides?.team2 === "CT" ? payload.sides.team2 : null,
-      };
+      state.sides = { team1: null, team2: null };
       state.locked = Boolean(payload.locked);
       state.mode = payload.mode === "both" ? "both" : null;
 
@@ -105,7 +102,7 @@
   }
 
   function persist(state) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...state, sides: { team1: null, team2: null } }));
   }
 
   function splitFragments(rawInput) {
@@ -176,8 +173,6 @@
       zone2: document.querySelector('[data-drop-target="team2"]'),
       title1: document.getElementById("team-one-title"),
       title2: document.getElementById("team-two-title"),
-      side1: document.querySelector('[data-side-target="team1"]'),
-      side2: document.querySelector('[data-side-target="team2"]'),
     };
   }
 
@@ -209,18 +204,6 @@
     refs.title2.disabled = state.locked;
     refs.poolInput.disabled = state.locked;
     refs.resetBtn.disabled = state.locked;
-    refs.side1.disabled = state.locked;
-    refs.side2.disabled = state.locked;
-
-    refs.side1.classList.toggle("is-t", state.sides.team1 === "T");
-    refs.side1.classList.toggle("is-ct", state.sides.team1 === "CT");
-    refs.side1.classList.toggle("is-unknown", !state.sides.team1);
-    refs.side1.textContent = state.sides.team1 === "T" ? "T" : state.sides.team1 === "CT" ? "CT" : "—";
-
-    refs.side2.classList.toggle("is-t", state.sides.team2 === "T");
-    refs.side2.classList.toggle("is-ct", state.sides.team2 === "CT");
-    refs.side2.classList.toggle("is-unknown", !state.sides.team2);
-    refs.side2.textContent = state.sides.team2 === "T" ? "T" : state.sides.team2 === "CT" ? "CT" : "—";
 
     const mount = (slot, host) =>
       playersFor(state, slot).forEach((player) => {
@@ -317,6 +300,11 @@
       try {
         sessionStorage.removeItem("cs-tools-match-summary");
       } catch (_) {}
+      /* Tab-scoped roster copy: recap cannot rely on localStorage (privacy / cleared storage / embed). */
+      try {
+        sessionStorage.setItem("cs-tools-roster-at-lock", JSON.stringify(stateRef.players));
+        sessionStorage.removeItem("cs-tools-sides-at-lock");
+      } catch (_) {}
       const teamOne = encodeURIComponent(
         stateRef.titles.team1.trim() || playersFor(stateRef, "team1")[0]?.name || "Team 1",
       );
@@ -366,9 +354,6 @@
       persist(stateRef);
     });
 
-    refs.side1.addEventListener("click", () => cycleSide("team1"));
-    refs.side2.addEventListener("click", () => cycleSide("team2"));
-
     refs.poolInput.addEventListener("keydown", (event) => {
       if (event.key !== "Enter") return;
       event.preventDefault();
@@ -392,18 +377,6 @@
       poolMeasured = true;
       render(stateRef);
     });
-  }
-
-  function cycleSide(slotKey) {
-    if (stateRef.locked) return;
-    const order = [null, "T", "CT"];
-    const currentIdx = Math.max(
-      0,
-      order.findIndex((value) => value === stateRef.sides[slotKey]),
-    );
-    stateRef.sides[slotKey] = order[(currentIdx + 1) % order.length];
-    persist(stateRef);
-    render(stateRef);
   }
 
   if (document.readyState === "loading") {
